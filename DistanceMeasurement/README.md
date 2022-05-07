@@ -1,7 +1,7 @@
 # Distance Measurement Scripts for NAMD trajectories
 
 ## distanceCalculation.py
-Usage: `python distanceCalculation.py -i input_file [-d] dimension`
+Usage: `python distanceCalculation.py -i input_file [-d] dimension`\n
 Reminder/Help: `python distanceCalculation.py -h`
 Requires: Prody (can be installed via conda). I believe Prody requires MDAnalysis as well.
 
