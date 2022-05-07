@@ -4,8 +4,9 @@
 ## distanceCalculation.py
 WARNING: This script takes advantage of multicore processing due to `prody` and `numpy` configuration.
 If used in don-elias, set the Open MP threads variable first to limit core usage: `export OMP_NUM_THREADS=6` should be enough to get good performance.
+Also, the results are loaded in memory before writing to disk. This may result in high memory usage!
 
-This scripts calculates the one of 3 options: The Z distance (-d 1), the radial distance (-d 2), or the 3D distance (default, -d 3). It outputs a file with the number of selections minus 1 (N - 1) columns of distances. The first column is the frame index. The selection labels are used as headers for each column, which might make the output file's first line a bit clumpy. Distances are calculated between the first selection `sel`, from top to bottom, and all others. So, this is a 1 to N calculation.
+This scripts calculates one of 3 distances: The Z distance (-d 1), the 2D radial distance (-d 2), or the 3D distance (default, -d 3). The script doesn't load the whole trajectory at once, but instead processes each frame by itself, one by one. It outputs a file with the number of selections minus 1 (N - 1) columns of distances. The first column is the frame index. The selection labels are used as headers for each column, which might make the output file's first line a bit clumpy. Distances are calculated between the first selection `sel`, from top to bottom, and all others. So, this is a 1 to N calculation.
 
 &nbsp;&nbsp; |- Running: `python distanceCalculation.py -i input_file [-d dimension]` <br />
 &nbsp;&nbsp; |- Reminder/Help: `python distanceCalculation.py -h` <br />
