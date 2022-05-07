@@ -16,7 +16,7 @@ The `atomIndexFile` must be prepared beforehand, and should contain the pore/cha
 This output `outname.dcd` should be entered in the input file (inputTemplate.in) for the next script, under the "dcd" keyword.
 
 ## trajHOLE.py
-This scripts leverages the MDAnalysis package for batch HOLE analysis of a .dcd, without having to convert every single frame to a .pdb file.
+This script leverages the MDAnalysis package for batch HOLE analysis of a .dcd, without having to convert every single frame to a .pdb file.
 It's recommended that the .dcd trajectory be aligned to a reference (see `center.tcl` script described above),
 and the pore to be studied should preferably be singled out, eliminating everything else appart from it from the trajectory.
 Execution of the python script can be achieved by running `python trajHOLE.py -i inputFile.in [-p /path/to/HOLEbinary]`<br/>
