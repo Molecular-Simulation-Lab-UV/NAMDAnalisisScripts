@@ -1,3 +1,4 @@
+[![Prody](https://img.shields.io/badge/powered%20by-ProDy-green)](http://prody.csb.pitt.edu/index.html)
 # Distance Measurement Scripts for NAMD trajectories
 
 ## distanceCalculation.py
