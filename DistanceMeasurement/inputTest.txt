@@ -1,0 +1,13 @@
+# Elements necessary: Path to a pdb for frame alignment; path to at least one dcd; a reference selection (ref) for alignment;
+# at least 2 selections, first (from the top) being the one to measure all others against
+
+pdb	ref.pdb
+dcd1	dcd1.dcd
+dcd2	dcd2.dcd
+dcd3	dcd3.dcd
+ref	Reference selection in VMD format (chain/resid/index/etc A/1/1/etc and/or/not etc etc) Must not include ""
+sel1	Selection 1, VMD format. This will be the primary selection.
+sel2	Selection 2, VMD format
+sel3	Idem
+sel4	Idem
+out	output file name. No spaces allowed. Optional input
