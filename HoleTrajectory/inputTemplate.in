@@ -3,7 +3,7 @@
 
 dcd	path/to/dcdFile.dcd
 psf	path/to/psfFile.psf
-sel	Optional: Selection, pseudo-VMD format (check MDAnalysis docs https://docs.mdanalysis.org/stable/documentation_pages/analysis/hole2.html under 4.4.1.1.1.4)
-out	path/to/outFile.out [Optional]
+sel	[Optional] Selection, pseudo-VMD format (check MDAnalysis docs https://docs.mdanalysis.org/stable/documentation_pages/analysis/hole2.html under 4.4.1.1.1.4)
+out	[Optional] path/to/outFile.out
 bin	numBins	lowerZ	upperZ
 keep	[Optional, keeps HOLE output files. Not recommended due to high file count. Remove this whole line to delete files when finished]
