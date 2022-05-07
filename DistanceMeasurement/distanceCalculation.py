@@ -30,7 +30,7 @@ dcdName = []
 outName = 'outFile.dat'
 
 # =============================================================================
-# Parsing input the file to gather inputs and selections.
+# Parsing the input file to gather inputs and selections.
 # Ref is taken as an alignment selection. Then we search for sel. First in top-down arrangement is the main one.
 # The distance is calculated between this first selection and all others.
 # =============================================================================
