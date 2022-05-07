@@ -7,7 +7,7 @@ If used in don-elias, set the Open MP threads variable first to limit core usage
 
 This scripts calculates the one of 3 options: The Z distance (-d 1), the radial distance (-d 2), or the 3D distance (default, -d 3). It outputs a file with the number of selections minus 1 (N - 1) columns of distances. The first column is the frame index. The selection labels are used as headers for each column, which might make the output file's first line a bit clumpy. Distances are calculated between the first selection `sel`, from top to bottom, and all others. So, this is a 1 to N calculation.
 
-&nbsp;&nbsp; |- Running: `python distanceCalculation.py -i input_file [-d] dimension` <br />
+&nbsp;&nbsp; |- Running: `python distanceCalculation.py -i input_file [-d dimension]` <br />
 &nbsp;&nbsp; |- Reminder/Help: `python distanceCalculation.py -h` <br />
 &nbsp;&nbsp; |- Requires: Prody (can be installed via conda). I believe Prody requires MDAnalysis as well.
 
