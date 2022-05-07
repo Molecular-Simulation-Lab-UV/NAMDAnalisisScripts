@@ -19,7 +19,7 @@ This scripts leverages the MDAnalysis package for batch HOLE analysis of a .dcd,
 It's recommended that the .dcd trajectory be aligned to a reference (see `center.tcl` script described above),
 and the pore to be studied should preferably be singled out, eliminating everything else appart from it from the trajectory.
 Execution of the python script can be achieved by running `python trajHOLE.py -i inputTemplate.in [-p /path/to/HOLEbinary]`<br/>
-The input file for `trajHole.py` should contain:
+The input file for `trajHole.py` should contain:<br />
 &nbsp;&nbsp; |- `dcd`: Path to the pre-processed .dcd file. This file should preferably only contain the pore/chain along the trajectory. <br />
 &nbsp;&nbsp; |- `psf`: Path to the corresponding .psf file. By that, we mean it should match the atoms contained in the .dcd file <br />
 &nbsp;&nbsp; |- `bin`: Optional: A three-column argument. The first is the number of bins. The second and third are the lower and upper Z position for binning the pore. Defaults to [100, -20, 20] <br />
