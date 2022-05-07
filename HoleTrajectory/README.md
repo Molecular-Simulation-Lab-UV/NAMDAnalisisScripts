@@ -4,7 +4,8 @@
 
 ## center.tcl
 Small script to align trajectories. The user has to change the selection inside the script first. Then, usage is as follows (in don-elias), with vmd in the path: <br />
-`vmd-1.9.3 -e center.tcl -args /path/to/psfFile.psf /path/to/refPDB.pdb /path/to/inputDCD.dcd/ /path/to/outputDCD.dcd`<br />
+```
+vmd-1.9.3 -e center.tcl -args /path/to/psfFile.psf /path/to/refPDB.pdb /path/to/inputDCD.dcd/ /path/to/outputDCD.dcd```
 The input of `center.tcl` (inputDCD.dcd, third argument) should preferably be a pre-processed .dcd file with only the pore/chain atoms to be analyzed, obtained from (in don-elias):
 
 ```
