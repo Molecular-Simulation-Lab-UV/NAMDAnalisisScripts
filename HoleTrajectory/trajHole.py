@@ -7,9 +7,24 @@ Third column: standard deviation for that bin.
 """
 
 import numpy
+import time
 import argparse
 import MDAnalysis
 import MDAnalysis.analysis.hole2 as hole2
+
+# Print time in hours, mins, secs
+def time_format(tstart, tstop):
+	s = tstop - tstart
+	if s < 60:
+		print('Done. Completion time was {0:2.0f}s'.format(s))
+	elif s > 60 and s < 3600:
+		temp = (s)//60
+		print('Done. Completion time was {0:2.0f}m:{1:2.0f}s'.format(temp, s - temp*60))
+	elif s > 3600 and s < 86400:
+		hours = s//3600
+		mins = (s - hours*3600)//60
+		secs = s - hours*3600 - mins*60
+		print('Done. Completion time was {0:2.0f}h:{1:2.0f}m:{2:2.0f}s'.format(hours, mins, secs))
 
 holePath = '/opt/hole/hole2/exe/hole' # It's supposed to detect the binary in the path (module load hole2/hole), but never worked for me.
 outName = 'outFile.dat'
@@ -42,6 +57,9 @@ inFile.close()
 if arg.hole_path != None:
 	holePath = arg.hole_path
 
+print('\nInitiating HOLE calculation over the given trajectory.\n ... \n')
+t1 = time.perf_counter()
+
 uni = MDAnalysis.Universe(psfName, dcdName)
 if 'selName' in locals() and len(selName) >= 1:
 	traj = hole2.HoleAnalysis(uni, select = selName, executable = holePath)
@@ -51,6 +69,11 @@ else:
 
 traj.run(random_seed = 1000)
 
+t2 = time.perf_counter()
+print('\n')
+time_format(t1, t2)
+
+print('Binning and writing output file')
 
 # Data ready for plot, adjusted to the stolen plot code
 
@@ -73,6 +96,8 @@ outFile.close()
 if delFiles == True:
 	traj.delete_temporary_files()
 
+t3 = time.perf_counter()
+time_format(t2, t3)
 
 #	Robado de HoleAnalysis (MDAnalysis --> analysis --> hole.py)
 #        binned, bins = self.bin_radii(frames=frames, bins=bins, range=range)
