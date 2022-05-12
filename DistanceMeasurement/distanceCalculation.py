@@ -9,7 +9,7 @@ Created on Tue May  3 12:58:18 2022
 import prody
 import numpy
 import argparse
-import time
+from datetime import datetime
 
 parser = argparse.ArgumentParser(description = 'Program to calculate distances between a first selection and all others')
 parser.add_argument('-i', '--in_file', type = str, required = True, help = 'Path, either absolute or relative, to input file.')
@@ -112,7 +112,7 @@ else:
     selections = list(pdb.select(selName[1]))
 
 print('\nBeginning distance calculations for {0} frames'.format(len(traj)))
-t1 = time.perf_counter()
+t1 = datetime.now()
 
 # Calculate the distances
 distArray = numpy.zeros((len(traj), len(selName[1:])))
@@ -136,7 +136,7 @@ print('Done. Writing output file')
 
 # For writing to outFile with "join" option.
 distArray = distArray.astype('str')
-    
+
 outFile = open(outName, 'w+')
 outFile.write('#Frame \t {0} \n'.format('\t '.join(selNameDummy[1:])))
 for k, vals in enumerate(distArray):
@@ -144,5 +144,5 @@ for k, vals in enumerate(distArray):
     
 outFile.close()
 
-t2 = time.perf_counter()
-print('Done. Completion took {0:8.3f} seconds'.format(t2-t1))
+t2 = datetime.now()
+print('Done. Completion took {0} seconds'.format((t2-t1).replace(microsecond=0)))
