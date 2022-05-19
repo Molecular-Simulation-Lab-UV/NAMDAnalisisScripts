@@ -23,7 +23,7 @@ else:
     dim = arg.dimension
 
 #  Should usually go lower, but we put it here to be able to select multiple dcds and selections
-selName = []
+selName = {}
 dcdName = []
 
 # Standard outFile name to avoid error when writing. If set in the input file, the name will be replaced.
@@ -48,11 +48,15 @@ for line in inFile:
             refName = l[1]
     elif l[0] == 'pdb':
         pdbName = l[1]
-    elif 'sel' in l[0]:
-        if len(l[1]) > 1:
-            selName.append(' '.join(l[1:]))
+    elif 'sel' in l[0] or 'Sel' in l[0] or 'SEL' in l[0]:
+        if len(l[1]) > 1 and len(selName) == 0:
+            mainSel = ' '.join(l[1:])
+        elif len(l[1]) > 0 and len(selName) > 0:
+            selName[l[0]] = ' '.join(l[1:])
+        elif len(l[1]) < 2 and len(selName) == 0:
+            mainSel = l[1]
         else:
-            selName.append(l[1])
+            selName[l[0]] = l[1]
     elif l[0] == 'out':
         outName = l[1]
 
@@ -61,7 +65,7 @@ inFile.close()
 dcdName = sorted(dcdName) # Arranges the paths to dcds numerically. (Made for eq1/2/3/4, etc)
 traj = prody.Trajectory(dcdName[0])
 pdb = prody.parsePDB(pdbName)
-selNameDummy = selName.copy() # Keep a copy to label columns in output file
+# selNameDummy = selName.copy() # Keep a copy to label columns in output file
 
 # "Add" all of the trajectories, one after the other, together.
 if len(dcdName) > 1:
@@ -102,14 +106,14 @@ def calc2D(sel1, sel2):
 
 # Set the first element as the one which all distance measurements will be
 # calculated against.
-refSel = pdb.select(selName[0])
+refSel = pdb.select(mainSel)
 
 if len(selName) > 2:
     selections = []
-    for i in selName[1:]:
-        selections.append(pdb.select(i))
+    for key in selName:
+        selections.append(pdb.select(selName[key]))
 else:
-    selections = list(pdb.select(selName[1]))
+    selections = list(pdb.select(selName[selName.keys()[-1]]))
 
 print('\nBeginning distance calculations for {0} frames'.format(len(traj)))
 t1 = datetime.now()
@@ -138,7 +142,7 @@ print('Done. Writing output file')
 distArray = distArray.astype('str')
 
 outFile = open(outName, 'w+')
-outFile.write('#Frame \t {0} \n'.format('\t '.join(selNameDummy[1:])))
+outFile.write('#Frame \t {0} \n'.format('\t '.join(selName.keys())))
 for k, vals in enumerate(distArray):
     outFile.write('{0:7} \t {1} \n'.format(k, '\t'.join(vals)))
     
