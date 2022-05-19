@@ -149,4 +149,4 @@ for k, vals in enumerate(distArray):
 outFile.close()
 
 t2 = datetime.now()
-print('Done. Completion took {0} seconds'.format((t2-t1).replace(microsecond=0)))
+print('Done. Completion took {0}'.format((t2.replace(microsecond=0) - t1.replace(microsecond=0))))
