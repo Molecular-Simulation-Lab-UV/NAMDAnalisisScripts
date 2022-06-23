@@ -16,7 +16,7 @@ parser.add_argument('-a', '--angles', type=str, required=False, help='"phi", "ps
 arg = parser.parse_args()
 
 dcdName = []
-outName = 'outFile.out'
+outName = 'outFile.dat'
 
 if arg.angles != None:
     angle = arg.angles
@@ -73,7 +73,7 @@ traj.setAtoms(pdb.select(refSel))
 
 #Arrays for storing the calculated values
 
-if len(traj) > 1e4 and len(unis) > 3 and angle == 'both' and socket.gethostname != 'don-elias':
+if len(traj) > 1e4 and len(unis) > 3 and angle == 'both' and socket.gethostname() != 'don-elias':
     print('Better run this on the server. Otherwise memory will probably go (╯°□°)╯︵ ┻━┻ \n')
     print('Recommendation is to Ctrl + C this process and run it on don-elias.')
 
@@ -85,18 +85,18 @@ if angle == 'phi':
     for i, frame in enumerate(traj):
         frame.superpose()
         for j, res in enumerate(unis):
-            dih[i, j] = prody.calcPhi(selUniverse[chainID,chainID,res])
+            dih[i, j] = prody.calcPhi(selUniverse[chainID,chainID,res],dist=None)
 elif angle == 'psi':
     for i, frame in enumerate(traj):
         frame.superpose()
         for j, res in enumerate(unis):
-            dih[i, j] = prody.calcPsi(selUniverse[chainID,chainID,res])
+            dih[i, j] = prody.calcPsi(selUniverse[chainID,chainID,res],dist=None)
 else:
     for i, frame in enumerate(traj):
         frame.superpose()
         for j, res in enumerate(unis):
-            dih[i, j] = prody.calcPhi(selUniverse[chainID,chainID,res])
-            dih2[i, j] = prody.calcPsi(selUniverse[chainID,chainID,res])
+            dih[i, j] = prody.calcPhi(selUniverse[chainID,chainID,res],dist=None)
+            dih2[i, j] = prody.calcPsi(selUniverse[chainID,chainID,res],dist=None)
 
 # Cast as string to be able to write to file easier
 dih = dih.astype('str')
@@ -106,22 +106,28 @@ if angle == 'both':
 unis = unis.copy().astype('str')
 
 if '.out' in outName:
-    outName = outName.split('.out')[0]
+	ending = '.out'
+elif '.dat' in outName:
+	ending = '.dat'
+else:
+	ending = '.' + outName.split('.')[-1]
+
+outName = outName.split(ending)[0]
 if angle != 'both':
-    outFile = open(outName + '.' + angle + '.out', 'w+')
+    outFile = open(outName + '.' + angle + ending, 'w+')
     outFile.write('#Frame \t resids {0} \n'.format('\t '.join(unis)))
     for k, vals in enumerate(dih):
         outFile.write('{0:7} \t {1} \n'.format(k, '\t '.join(vals)))
     outFile.close()
 else:
     # Write phi bond angles
-    outFile1 = open(outName + '.phi.out', 'w+')
+    outFile1 = open(outName + '.phi' + ending, 'w+')
     outFile1.write('#Frame \t resids {0} \n'.format('\t '.join(unis)))
     for k, vals in enumerate(dih):
         outFile1.write('{0:7} \t {1} \n'.format(k, '\t '.join(vals)))
     outFile1.close()
     # Write psi bond angles
-    outFile2 = open(outName + '.psi.out', 'w+')
+    outFile2 = open(outName + '.psi' + ending, 'w+')
     outFile2.write('#Frame \t resids {0} \n'.format('\t '.join(unis)))
     for k, vals in enumerate(dih2):
         outFile2.write('{0:7} \t {1} \n'.format(k, '\t '.join(vals)))
