@@ -1,7 +1,7 @@
 [![Prody](https://img.shields.io/badge/powered%20by-ProDy-9cf)](http://prody.csb.pitt.edu/index.html)
 # Script for angle calculation.
 
-##measureAngles.py
+## measureAngles.py
 This script calculates the phi angle, the psi angle, or both, for a vmd-style selection specified in the input file.
 BEFORE USING IT IN DON-ELIAS: `export OMP_NUM_THREADS = X`, where `X` is the number of cores to be used. Normally 6 would be enough to get results quickly, but it depends on the availability.
 
