@@ -1,8 +1,8 @@
-pdb	6.6.2.4.box.pdb
-dcd1	../eqf3_wrap.dcd
-rad	4
-upperZ	11
-lowerZ	-11
-ref	resname CNT
-sel	name OH2
-out	testOut.out
+dcd1      ../eqf3_wrap.dcd
+rad       4
+pdb       ./6.6.2.4.box.pdb
+upperZ    11
+lowerZ    -11
+ref       resname CNT
+sel       name OH2
+out       testOut.out
