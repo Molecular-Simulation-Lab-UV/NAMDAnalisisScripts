@@ -42,13 +42,13 @@ for line in inFile:
         else:
             refName = l[1]
     elif l[0].lower() == 'rad':
-        rad = l[1]
+        rad = float(l[1])
         rad2 = rad**2
     elif l[0].lower() == 'upperz':
-        upZ = l[1]
+        upZ = float(l[1])
     elif l[0].lower() == 'lowerz':
-        loZ = l[1]
-    elif 'sel' in l[0]: # Should be a broader selection, not including the position bounds (without "and z <= XX")
+        loZ = float(l[1])
+    elif 'sel' in l[0]: # Should be a broader selection, not including the position bounds (without "and z <= XX") E.g., "name OH2"
         if len(l[1:]) > 1:
             selName = ' '.join(l[1:])
         else:
