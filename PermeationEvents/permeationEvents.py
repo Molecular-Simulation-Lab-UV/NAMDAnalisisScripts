@@ -70,7 +70,7 @@ elif direction == 'up' or direction == 'down':
 
 traj.link(pdb)
 traj.setCoords(pdb)
-traj.setAtoms(refName)
+traj.setAtoms(pdb.select(refName))
 atomsSelection = pdb.select(selName)
 
 # Initialise the dictionary with zeros. Values will change when permeation events are detected, and all three are reset to 0.
