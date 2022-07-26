@@ -1,0 +1,8 @@
+dcd1      /home/nespinoza/Colab_Caviglia/CNT_test/TestFiles/eqf3_wrap.dcd 
+rad       4
+pdb       ./NAMDAnalisisScripts/PermeationEvents/6.6.2.4.box.pdb
+upperZ    10
+lowerZ    -10
+ref       resname CNT
+sel       name OH2
+out       testOut.out

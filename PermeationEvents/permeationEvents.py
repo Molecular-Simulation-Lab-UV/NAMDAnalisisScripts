@@ -7,11 +7,14 @@ going from the inner solvent to the outer solvent throught the pore. To achieve 
 import prody
 import numpy
 import argparse
+import sys
 from datetime import datetime
+
+numpy.set_printoptions(threshold=sys.maxsize)
 
 parser = argparse.ArgumentParser(description = 'Calculate the RMSD Matrix of a trajectory for input in the GROMOS++ clustering program.')
 parser.add_argument('-i', '--in_file', type = str, required = True, help = 'Path, either absolute or relative, to the input file')
-parser.add_argument('-d', '--direction', type = str, required = False, help = 'Count events in the "up" direction (z+), "down" direction (z-), or "total" events. Default = "total"')
+parser.add_argument('-d', '--direction', type = str, required = False, help = 'Count events in the "up" direction (z+), "down" direction (z-), or "both" events. Default = "both"')
 
 arg = parser.parse_args()
 inFile = open(arg.in_file, 'r')
@@ -80,9 +83,10 @@ atomIDs = atomsSelection.getIndices()
 for ind in atomIDs:
     dataDict[ind] = 0
 
-flagsOld = numpy.zeros(len(atomsSelection), 2)
-permArray = numpy.zeros((len(traj), NN)) # Array containing the counters for permeation in each direction, according to NN (line 67 of the script).
-permArray = numpy.hstack((numpy.linspace(0, len(traj), len(traj) + 1), permArray), dtype = int)
+flagsOld = numpy.zeros((len(atomsSelection), 2))
+permArray = numpy.zeros((len(traj), NN)) # Array containing the counters for permeation in each direction, according to NN (line 67 of the script)
+permArray = numpy.hstack((numpy.linspace(1, len(traj), len(traj))[:,numpy.newaxis], permArray)).astype('int')
+
 
 # def getOldPos():
 #     atomIDs = pdb.select(selName).getIndices()
@@ -98,8 +102,9 @@ if direction == 'up':
         frame.superpose()
         posArray = atomsSelection.getCoords()
         flags = numpy.where([posArray[:,2] < 0, posArray[:,2] > 0], [numpy.ones(len(posArray)), 6*numpy.ones(len(posArray))], numpy.zeros(len(posArray)))
+        flags = flags.T
         # inCyl = numpy.argwhere((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ))
-        inCyl = numpy.where(((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2]) > loZ), 3*numpy.ones(len(posArray)), flags)
+        inCyl = numpy.where((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ), 3*numpy.ones(len(posArray)), flags)
 
         diffArray = numpy.concatenate(numpy.argwhere(flags - flagsOld[:,-1] != 0))
 
@@ -117,8 +122,9 @@ elif direction == 'down':
         frame.superpose()
         posArray = atomsSelection.getCoords()
         flags = numpy.where([posArray[:,2] < 0, posArray[:,2] > 0], [numpy.ones(len(posArray)), 6*numpy.ones(len(posArray))], numpy.zeros(len(posArray)))
-        # inCyl = numpy.argwhere((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ))
-        inCyl = numpy.where(((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2]) > loZ), 3*numpy.ones(len(posArray)), flags)
+        flags = flags.T
+	# inCyl = numpy.argwhere((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ))
+        inCyl = numpy.where((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ), 3*numpy.ones(len(posArray)), flags)
 
         diffArray = numpy.concatenate(numpy.argwhere(flags - flagsOld[:,-1] != 0))
 
@@ -130,32 +136,34 @@ elif direction == 'down':
             flagsOld[value,-1] = flags[value]
 
 elif direction == 'both':
+#    tf = open('wtf.out', 'w+')
     counter = [0, 0]
     for i, frame in enumerate(traj):
         frame.superpose()
         posArray = atomsSelection.getCoords()
-        flags = numpy.where([posArray[:,2] < 0, posArray[:,2] > 0], [numpy.ones(len(posArray)), 6*numpy.ones(len(posArray))], numpy.zeros(len(posArray)))
-        # inCyl = numpy.argwhere((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ))
-        inCyl = numpy.where(((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2]) > loZ), 3*numpy.ones(len(posArray)), flags)
+#        flags = numpy.where([posArray[:,2] < 0, posArray[:,2] > 0], [numpy.ones(len(posArray)), 6*numpy.ones(len(posArray))], numpy.zeros(len(posArray)))
+        flags = numpy.where(posArray[:,2] < 0, numpy.ones(len(posArray)), 6*numpy.ones(len(posArray)))
+    	# inCyl = numpy.argwhere((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ))
+        flags = numpy.where((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ), 3*numpy.ones(len(posArray)), flags)
+        flags = flags.T
 
         diffArray = numpy.concatenate(numpy.argwhere(flags - flagsOld[:,-1] != 0))
 
         for value in diffArray:
-            if 1 + numpy.sum((flagsOld[value], flags[value])) == 7:
+            if 2 - flagsOld[value, -2] + flags[value] == 7:
                 counter[0] += 1
-            elif 1 + numpy.sum((flagsOld[value], flags[value])) == -3:
+            elif 2 - flagsOld[value, -2] + flags[value] == -3:
                 counter[1] += 1
 
-            permArray[-3] = counter[1] # Direction -z
-            permArray[-2] = counter[0] # Direction +z
-            permArray[-1] = counter[0] + counter[1] # Total count
-            numpy.roll(flagsOld[value],-1)
+            permArray[i,-3] = counter[1] # Direction -z
+            permArray[i,-2] = counter[0] # Direction +z
+            permArray[i,-1] = counter[0] + counter[1] # Total count
+            flagsOld[value] = numpy.roll(flagsOld[value],-1)
             flagsOld[value,-1] = flags[value]
-
-    else:
-        print('PROBLEM: Direction incorrect!')
-        exit()
-
+#    tf.close()
+else:
+    print('PROBLEM: Direction incorrect!')
+    exit()
 
 permArray = permArray.astype('str')
 
