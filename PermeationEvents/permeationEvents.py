@@ -101,10 +101,9 @@ if direction == 'up':
     for i, frame in enumerate(traj):
         frame.superpose()
         posArray = atomsSelection.getCoords()
-        flags = numpy.where([posArray[:,2] < 0, posArray[:,2] > 0], [numpy.ones(len(posArray)), 6*numpy.ones(len(posArray))], numpy.zeros(len(posArray)))
+        flags = numpy.where(posArray[:,2] < 0, numpy.ones(len(posArray)), 6*numpy.ones(len(posArray)))
+        flags = numpy.where((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ), 3*numpy.ones(len(posArray)), flags)
         flags = flags.T
-        # inCyl = numpy.argwhere((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ))
-        inCyl = numpy.where((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ), 3*numpy.ones(len(posArray)), flags)
 
         diffArray = numpy.concatenate(numpy.argwhere(flags - flagsOld[:,-1] != 0))
 
@@ -121,10 +120,9 @@ elif direction == 'down':
     for i, frame in enumerate(traj):
         frame.superpose()
         posArray = atomsSelection.getCoords()
-        flags = numpy.where([posArray[:,2] < 0, posArray[:,2] > 0], [numpy.ones(len(posArray)), 6*numpy.ones(len(posArray))], numpy.zeros(len(posArray)))
+        flags = numpy.where(posArray[:,2] < 0, numpy.ones(len(posArray)), 6*numpy.ones(len(posArray)))
+        flags = numpy.where((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ), 3*numpy.ones(len(posArray)), flags)
         flags = flags.T
-	# inCyl = numpy.argwhere((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ))
-        inCyl = numpy.where((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ), 3*numpy.ones(len(posArray)), flags)
 
         diffArray = numpy.concatenate(numpy.argwhere(flags - flagsOld[:,-1] != 0))
 
@@ -136,14 +134,11 @@ elif direction == 'down':
             flagsOld[value,-1] = flags[value]
 
 elif direction == 'both':
-#    tf = open('wtf.out', 'w+')
     counter = [0, 0]
     for i, frame in enumerate(traj):
         frame.superpose()
         posArray = atomsSelection.getCoords()
-#        flags = numpy.where([posArray[:,2] < 0, posArray[:,2] > 0], [numpy.ones(len(posArray)), 6*numpy.ones(len(posArray))], numpy.zeros(len(posArray)))
         flags = numpy.where(posArray[:,2] < 0, numpy.ones(len(posArray)), 6*numpy.ones(len(posArray)))
-    	# inCyl = numpy.argwhere((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ))
         flags = numpy.where((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ), 3*numpy.ones(len(posArray)), flags)
         flags = flags.T
 
@@ -160,10 +155,11 @@ elif direction == 'both':
             permArray[i,-1] = counter[0] + counter[1] # Total count
             flagsOld[value] = numpy.roll(flagsOld[value],-1)
             flagsOld[value,-1] = flags[value]
-#    tf.close()
+
 else:
     print('PROBLEM: Direction incorrect!')
     exit()
+
 
 permArray = permArray.astype('str')
 
@@ -176,7 +172,7 @@ else:
     outFile.write('#Frame \t z- P. Events \t z+ P.Events \t Total \n')
 
 for vals in permArray:
-    outFile.write('{0} \n'.format(' \t'.join(vals)))
+    outFile.write('{0} \n'.format(' \t '.join(vals)))
     
 outFile.close()
 
