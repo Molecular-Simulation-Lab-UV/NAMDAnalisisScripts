@@ -1,6 +1,6 @@
 """
 This program relies on a user-defined cylinder that roughly defines the pore in order to count molecules
-going from the inner solvent to the outer solvent throught the pore. To achieve this, the variables
+going from the inner solvent to the outer solvent through the pore. To achieve this, the variables
 'upperZ', 'lowerZ' and 'rad' are needed in the input file, which differs from other scripts in this repository.
 """
 
