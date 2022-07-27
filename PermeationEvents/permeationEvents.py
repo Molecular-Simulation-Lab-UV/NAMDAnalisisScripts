@@ -64,7 +64,7 @@ traj = prody.DCDFile(dcdName[0])
 
 if len(traj) > 1:
     for d in dcdName[1:]:
-        traj.addfile(d)
+        traj.addFile(d)
 
 if direction == 'both':
     NN = 3
