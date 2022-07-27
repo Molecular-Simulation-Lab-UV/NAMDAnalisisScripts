@@ -60,7 +60,7 @@ for line in inFile:
         outName = l[1]
 
 pdb = prody.parsePDB(pdbName)
-traj = prody.DCDFile(dcdName[0])
+traj = prody.Trajectory(dcdName[0])
 
 if len(traj) > 1:
     for d in dcdName[1:]:
