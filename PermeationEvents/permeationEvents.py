@@ -9,7 +9,7 @@ import numpy
 import argparse
 from datetime import datetime
 
-parser = argparse.ArgumentParser(description = 'Calculate the RMSD Matrix of a trajectory for input in the GROMOS++ clustering program.')
+parser = argparse.ArgumentParser(description = "Calculate the permeation events of selection's atoms through an equivalent cylinder.")
 parser.add_argument('-i', '--in_file', type = str, required = True, help = 'Path, either absolute or relative, to the input file')
 
 arg = parser.parse_args()
@@ -113,12 +113,7 @@ for i, frame in enumerate(traj):
 permArray = permArray.astype('str') # Handy for writing to a file
 
 outFile = open(outName, 'w+')
-if direction == 'up':
-    outFile.write('#Frame \t z+ permeations events \n')
-elif direction == 'down':
-    outFile.write('#Frame \t z- permeation events \n')
-else:
-    outFile.write('#Frame \t z- P. Events \t z+ P.Events \t Total \n')
+outFile.write('#Frame \t z- P. Events \t z+ P.Events \t Total \n')
 
 for vals in permArray:
     outFile.write('{0} \n'.format(' \t '.join(vals)))
