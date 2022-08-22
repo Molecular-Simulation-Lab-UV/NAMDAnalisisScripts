@@ -53,7 +53,7 @@ inFile.close()
 # Setting up structure and linking the trajectory files to it.
 
 print('\nReading data from .psf file')
-psfData = pandas.DataFrame(columns = ['index', 'segname', 'resid', 'resname', 'atomName', 'atomType', 'charge', 'weight', 'beta', 'dummy1', 'dummy2'])
+psfData = pandas.DataFrame(columns = ['index', 'segname', 'resid', 'resname', 'atomName', 'atomType', 'charge', 'weight', 'beta'])
 psfFile = open(psfName, 'r')
 
 for i, psfLine in enumerate(psfFile):
