@@ -61,7 +61,6 @@ for i, psfLine in enumerate(psfFile):
     if '!NATOM' in l:
         length = int(psfLine.split()[0])
         break
-length = length + i
 for j, psfLine2 in enumerate(psfFile):
     if j < length:
         psfData.loc[len(psfData)] = psfLine2.strip().split()
