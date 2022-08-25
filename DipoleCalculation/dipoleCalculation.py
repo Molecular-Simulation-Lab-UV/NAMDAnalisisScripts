@@ -21,6 +21,11 @@ inFile = open(arg.in_file, 'r')
 dcdName = []
 outName = 'outFile.out'
 
+if arg.average != None:
+    avg = arg.average
+else:
+    avg = True
+
 # Reading inputs from the input parameters file. This is for the analysis calculation,
 # NOT for the simulation itself.
 
@@ -64,6 +69,8 @@ for i, psfLine in enumerate(psfFile):
 for j, psfLine2 in enumerate(psfFile):
     if j < length:
         psfData.loc[len(psfData)] = psfLine2.strip().split()
+    else:
+        break
 
 psfFile.close()
 
@@ -103,7 +110,7 @@ for f, frame in enumerate(dcd):
     center = prody.calcCenter(sel)
     atomPos = sel.getCoords()
     dipole = numpy.sum((atomPos - center)*charges)
-    dipole = numpy.sqrt(dipole.dot(dipole))
+    dipole = numpy.sqrt(dipole*dipole)
     dipoleArray[f] = dipole
 
 if arg.average:
