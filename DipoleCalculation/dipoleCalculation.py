@@ -57,31 +57,16 @@ inFile.close()
 
 # Setting up structure and linking the trajectory files to it.
 
-print('\nReading data from .psf file')
-psfData = pandas.DataFrame(columns = ['index', 'segname', 'resid', 'resname', 'atomName', 'atomType', 'charge', 'weight', 'beta'])
-psfFile = open(psfName, 'r')
-
-for i, psfLine in enumerate(psfFile):
-    l = psfLine.strip()
-    if '!NATOM' in l:
-        length = int(psfLine.split()[0])
-        break
-for j, psfLine2 in enumerate(psfFile):
-    if j < length:
-        psfData.loc[len(psfData)] = psfLine2.strip().split()
-    else:
-        break
-
-psfFile.close()
-
 pdb = prody.parsePDB(pdbName)
-sel = pdb.select(selName)
+atomSystem = prody.parsePSF('psfName', ag=pdb)
+sel = atomSystem.select(selName)
 dcd = prody.Trajectory(dcdName[0])
 if len(dcdName) > 1:
     for dcd1 in dcdName[1:]:
         dcd.addFile(dcd1)
 
-atoms = pdb.select(selName).getIndices()
+
+atoms = atomSystem.select(selName).getIndices()
 if len(atoms) < 2:
     print('************************')
     print('Something went wrong. You need at least 2 atoms to calculate dipoles!!! (╯°□°)╯︵ ┻━┻')
@@ -90,10 +75,7 @@ if len(atoms) < 2:
 
 t1 = datetime.now()
 
-charges = []
-for ind in atoms:
-    charges.append(psfData.query(f'index == "{ind}"')['charge'])
-charges = numpy.array(charges).astype('float32')
+charges = sel.getCharges()
 
 dcd.link(pdb)
 dcd.setCoords(pdb)
