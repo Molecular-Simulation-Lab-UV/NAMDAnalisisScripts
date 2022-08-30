@@ -58,7 +58,7 @@ inFile.close()
 # Setting up structure and linking the trajectory files to it.
 
 pdb = prody.parsePDB(pdbName)
-atomSystem = prody.parsePSF('psfName', ag=pdb)
+atomSystem = prody.parsePSF(psfName, ag=pdb)
 sel = atomSystem.select(selName)
 dcd = prody.Trajectory(dcdName[0])
 if len(dcdName) > 1:
