@@ -13,7 +13,7 @@ from datetime import datetime
 
 parser = argparse.ArgumentParser(description = 'Calculate the collective dipole of the given selection.')
 parser.add_argument('-i', '--in_file', type = str, required = True, help = 'Path, either absolute or relative, to the input file')
-parser.add_argument('-a', '--average', type = bool, required = False, help = 'Calculate the average for the trajectory (True), frame-by-frame-wise (False). Default is True (average).')
+parser.add_argument('-a', '--average', action = 'store_true', required = False, help = 'Calculate the average for the trajectory if included (with "-a" option), frame-by-frame-wise if not included.')
 
 arg = parser.parse_args()
 inFile = open(arg.in_file, 'r')
@@ -89,17 +89,17 @@ dipoleArray = numpy.zeros(len(dcd))
 
 for f, frame in enumerate(dcd):
     frame.superpose()
-    center = prody.calcCenter(sel)
+    center = prody.calcCenter(sel, weights=sel.getMasses())
     atomPos = sel.getCoords()
-    dipole = numpy.sum((atomPos - center)*charges)
-    dipole = numpy.sqrt(dipole*dipole)
-    dipoleArray[f] = dipole
+    dipole = numpy.sum((atomPos - center)*charges[:,numpy.newaxis], axis=0)
+    dipole2 = numpy.sqrt(numpy.sum(dipole*dipole))
+    dipoleArray[f] = dipole2
 
 if arg.average:
     dipoleAvg = numpy.average(dipoleArray)
     dipoleStd = numpy.std(dipoleArray)
     print('\nDipole average is {0:6.3f}'.format(dipoleAvg))
-    print('Dipole standard deviation is {0:6.3f}'.format())
+    print('Dipole standard deviation is {0:6.3f}'.format(dipoleStd))
 
 # FALTA CALCULAR LA MAGNITUD DE LOS VECTORES EN DIPOLEARRAY
 
