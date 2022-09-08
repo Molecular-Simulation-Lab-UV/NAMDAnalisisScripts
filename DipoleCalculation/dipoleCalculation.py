@@ -7,7 +7,6 @@ WARNING: ONLY WORKS FOR A FIXED SELECTION! SOMETHING LIKE "water and z > 4 and z
 
 import prody
 import numpy
-import pandas
 import argparse
 from datetime import datetime
 
@@ -53,18 +52,15 @@ for line in inFile:
         outName = l[1]
 
 inFile.close()
-# ADD CHECK TO SEE IF THE SELECTION HAS AT LEAST 2 ATOMS!
 
 # Setting up structure and linking the trajectory files to it.
-
-pdb = prody.parsePDB(pdbName)
-atomSystem = prody.parsePSF(psfName, ag=pdb)
+pdb = prody.parsePDB(pdbName) # Import and parse the .pdb
+atomSystem = prody.parsePSF(psfName, ag=pdb) # Import the .psf and associate the .pdb data to it
 sel = atomSystem.select(selName)
 dcd = prody.Trajectory(dcdName[0])
-if len(dcdName) > 1:
+if len(dcdName) > 1: # Check for and add corresponding dcd files to the trajectory (concatenate them)
     for dcd1 in dcdName[1:]:
         dcd.addFile(dcd1)
-
 
 atoms = atomSystem.select(selName).getIndices()
 if len(atoms) < 2:
@@ -81,18 +77,15 @@ dcd.link(pdb)
 dcd.setCoords(pdb)
 dcd.setAtoms(pdb.select(refName))
 
-# Get atom indexes from the input selection
-# Get charges from the dataframe based on the selection
 # Calculate and return dipole
-
 dipoleArray = numpy.zeros(len(dcd))
 
 for f, frame in enumerate(dcd):
     frame.superpose()
-    center = prody.calcCenter(sel, weights=sel.getMasses())
-    atomPos = sel.getCoords()
-    dipole = numpy.sum((atomPos - center)*charges[:,numpy.newaxis], axis=0)
-    dipoleM = numpy.sqrt(numpy.sum(dipole*dipole))
+    center = prody.calcCenter(sel, weights=sel.getMasses()) # Get the geometrical center of the selection
+    atomPos = sel.getCoords() # Get each of the selection's atoms' position
+    dipole = numpy.sum((atomPos - center)*charges[:,numpy.newaxis], axis=0) # Calculate the dipole as sum(q*(r_i - r_com)); com should be center of mass, but is taken as geometrical center.
+    dipoleM = numpy.sqrt(numpy.sum(dipole*dipole)) # Calculate the magnitud as the dot product of the selection's vector with itself, and then apply the square root.
     dipoleArray[f] = dipoleM
 
 if arg.average:
@@ -100,8 +93,6 @@ if arg.average:
     dipoleStd = numpy.std(dipoleArray)
     print('\nDipole average is {0:6.3f}'.format(dipoleAvg))
     print('Dipole standard deviation is {0:6.3f}'.format(dipoleStd))
-
-# FALTA CALCULAR LA MAGNITUD DE LOS VECTORES EN DIPOLEARRAY
 
 elif not arg.average:
     outFile = open(outName, 'w+')
