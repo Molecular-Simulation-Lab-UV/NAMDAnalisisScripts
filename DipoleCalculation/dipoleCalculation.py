@@ -92,8 +92,8 @@ for f, frame in enumerate(dcd):
     center = prody.calcCenter(sel, weights=sel.getMasses())
     atomPos = sel.getCoords()
     dipole = numpy.sum((atomPos - center)*charges[:,numpy.newaxis], axis=0)
-    dipole2 = numpy.sqrt(numpy.sum(dipole*dipole))
-    dipoleArray[f] = dipole2
+    dipoleM = numpy.sqrt(numpy.sum(dipole*dipole))
+    dipoleArray[f] = dipoleM
 
 if arg.average:
     dipoleAvg = numpy.average(dipoleArray)
