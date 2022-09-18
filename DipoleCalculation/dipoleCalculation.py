@@ -82,7 +82,7 @@ dipoleArray = numpy.zeros(len(dcd))
 
 for f, frame in enumerate(dcd):
     frame.superpose()
-    center = prody.calcCenter(sel, weights=sel.getMasses()) # Get the geometrical center of the selection
+    center = prody.calcCenter(sel, weights=None) # Get the geometrical center of the selection
     atomPos = sel.getCoords() # Get each of the selection's atoms' position
     dipole = numpy.sum((atomPos - center)*charges[:,numpy.newaxis], axis=0) # Calculate the dipole as sum(q*(r_i - r_com)); com should be center of mass, but is taken as geometrical center.
     dipoleM = numpy.sqrt(numpy.sum(dipole*dipole)) # Calculate the magnitud as the dot product of the selection's vector with itself, and then apply the square root.
