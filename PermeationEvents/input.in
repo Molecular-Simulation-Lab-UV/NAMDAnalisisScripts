@@ -1,4 +1,4 @@
-dcd1      /home/nespinoza/Colab_Caviglia/CNT_test/TestFiles/eqf3_wrap.dcd 
+dcd1      ../eqf3_wrap.dcd 
 rad       4
 pdb       ./6.6.2.4.box.pdb
 upperZ    10

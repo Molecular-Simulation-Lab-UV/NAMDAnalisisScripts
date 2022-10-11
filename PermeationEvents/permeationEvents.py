@@ -85,6 +85,7 @@ t1 = datetime.now()
 
 counter = [0, 0]
 for i, frame in enumerate(traj):
+    prody.wrapAtoms(frame)
     frame.superpose()
     posArray = atomsSelection.getCoords()
     # Flag atoms with postion z > 0 with 6, and z < 0 with 1
