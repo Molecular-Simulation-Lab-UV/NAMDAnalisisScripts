@@ -85,9 +85,9 @@ t1 = datetime.now()
 
 counter = [0, 0]
 for i, frame in enumerate(traj):
-    prody.wrapAtoms(frame)
     frame.superpose()
-    posArray = atomsSelection.getCoords()
+    f2 = prody.wrapAtoms(pdb, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
+    posArray = f2.select(selName).getCoords()
     # Flag atoms with postion z > 0 with 6, and z < 0 with 1
     flags = numpy.where(posArray[:,2] < 0, numpy.ones(len(posArray)), 6*numpy.ones(len(posArray)))
     # Include the flags for the atoms inside the cylinder
