@@ -114,7 +114,7 @@ for i, frame in enumerate(traj):
 permArray = permArray.astype('str') # Handy for writing to a file
 
 outFile = open(outName, 'w+')
-outFile.write('#Frame \t z- P. Events \t z+ P.Events \t Total \n')
+outFile.write('#Frame\t |\t z-\t |\t z+\t |\t Total Permeation Events\n')
 
 for vals in permArray:
     outFile.write('{0} \n'.format(' \t '.join(vals)))
