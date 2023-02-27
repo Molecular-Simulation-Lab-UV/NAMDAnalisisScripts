@@ -1,0 +1,52 @@
+# Data calculated by the VMD volmap function
+object 1 class gridpositions counts 5 5 5
+origin -2.5 -2.5 -2.5
+delta 5 0 0
+delta 0 5 0
+delta 0 0 5
+object 2 class gridconnections counts 5 5 5
+object 3 class array type double rank 0 items 125 data follows
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 6.43621e-008
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+0 0 
+
+object "density (index 1) [A^-3]" class field

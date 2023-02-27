@@ -1,0 +1,38 @@
+"""
+Currently, it only includes an external electric field's potential difference in the Z axis.
+TODO: add the axis option
+"""
+
+import gridData, argparse, numpy
+
+parser = argparse.ArgumentParser(description = "Add the effect of an external potential to the .dx file")
+parser.add_argument('-i', '--in_file', type = str, required = True, help = 'Path, either absolute or relative, to the dx file')
+parser.add_argument('-f', '--field', type = float, required = True, help = 'Value, in mV, of the external potential. E.g: -100')
+parser.add_argument('-o', 'out', type = str, required = False, help = 'Output path of the resulting modified DX file. ./outputDX.dx by default')
+
+arg = parser.parse_args()
+dx = gridData.Grid(arg.in_file)
+finalDX = dx.grid.copy()
+
+cF = 1/25.855 # Conversion factor @ 300 Kelvin
+
+if arg.field > 0:
+    # FALTA TRANSFORMARLO A UNIDADES NAMD
+    extPotential = numpy.linspace(0, arg.field*cF, dx.grid.shape[-1])
+    finalDX = finalDX + extPotential
+    
+elif arg.field < 0:
+    extPotential = numpy.arange(arg.field*cF, 0, dx.grid.shape[-1])
+    finalDX = finalDX + extPotential
+
+else:
+    print('Nothing to do here')
+    exit()
+
+dxOut = gridData.Grid(finalDX, edges=dx.edges, origin=dx.origin, delta=dx.delta)
+
+if arg.out != None:
+    dxOut.export(arg.out)
+else:
+    dxOut.export('outputDX.dx')
+# Make new grid and write data out
