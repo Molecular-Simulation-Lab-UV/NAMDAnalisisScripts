@@ -17,7 +17,7 @@ The input file for `permeationEvents.py` should contain:<br />
 &nbsp;&nbsp; |- `pdb`: Path to the corresponding .pdb file. <br />
 &nbsp;&nbsp; |- `upperZ`: Upper Z coordinate of the pore's bounding cylinder in the reference pdb structure. <br />
 &nbsp;&nbsp; |- `lowerZ`: Lower Z coordinate of the pore's bounding cylinder in the reference pdb structure. <br />
-&nbsp;&nbsp; |- `rad`: Radius of the bounding cylinder, measured in \[Angstrom] <br />
+&nbsp;&nbsp; |- `rad`: Radius of the bounding cylinder, measured in \[Å] <br />
 &nbsp;&nbsp; |- `ref`: VMD-like selection of the elements used for alignment between each frame in the trajectory and the reference structure. <br/>
 &nbsp;&nbsp; |- `sel`: VMD-like selection of the atoms or molecules whose permeation will be counted. E.g: `resname CLA` .<br/>
-&nbsp;&nbsp; |- `out`: \[Optional] Path and name of the output file.
+&nbsp;&nbsp; |- `out`: \[Optional] Path and name of the output file. Default is `outFile.out`.
