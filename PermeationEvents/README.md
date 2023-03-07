@@ -1,4 +1,4 @@
-[![Powered by MDAnalysis](https://img.shields.io/badge/status-testing-yellow)](https://www.mdanalysis.org)
+(https://img.shields.io/badge/status-testing-yellow)
 
 # Batch HOLE analysis
 
