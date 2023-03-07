@@ -1,30 +1,23 @@
 ![](https://img.shields.io/badge/status-testing-yellow)
 [![Prody](https://img.shields.io/badge/powered%20by-ProDy-9cf)](http://prody.csb.pitt.edu/index.html)
 
-# Batch HOLE analysis
+# Permeation Events count
 
-## center.tcl
-Small script to align trajectories. The user has to change the selection inside the script first. Then, usage is as follows (in don-elias), with vmd in the path: <br />
-```
-vmd-1.9.3 -e center.tcl -args /path/to/psfFile.psf /path/to/refPDB.pdb /path/to/inputDCD.dcd/ /path/to/outputDCD.dcd
-```
-The input of `center.tcl` (inputDCD.dcd, third argument) should preferably be a pre-processed .dcd file with only the pore/chain atoms to be analyzed, obtained from (in don-elias, with catdcd loaded):
+## Permeation events
+To count permeation events, we consider a cylinder as the definition of the pore through which the atom or molecule of interest permeates. So, we define permeation events as the transit of an atom or molecule from one side of that cylinder to the other, passing through said cylinder. Its long axis is always parallel to the simulations' Z axis, and the raidus in a plane parallel to that of the membrane (XY plane). <br />
 
-```
-catdcd -o outname.dcd -otype dcd -stride strideAmount -i atomIndexFile -first firstFrame -last lastFrame path/to/dcdFile.dcd
-```
-The `atomIndexFile` must be prepared beforehand, and should contain the pore/chain atom indexes only.
-This output `outname.dcd` should be entered in the input file (inputTemplate.in) for the next script, under the "dcd" keyword.
+## Running the program
+REMEMBER TO LIMIT YOUR VISIBLE CPUs!<br />
+`export OMP_NUM_THREADS=6` should be enough.
 
-## trajHOLE.py
-This script leverages the MDAnalysis package for batch HOLE analysis of a .dcd, without having to convert every single frame to a .pdb file.
-It's recommended that the .dcd trajectory be aligned to a reference (see `center.tcl` script described above),
-and the pore to be studied should preferably be singled out, eliminating everything else appart from it from the trajectory.
-Execution of the python script can be achieved by running `python trajHOLE.py -i inputFile.in [-p /path/to/HOLEbinary]`<br/>
-The input file for `trajHole.py` should contain:<br />
-&nbsp;&nbsp; |- `dcd`: Path to the pre-processed .dcd file. This file should preferably only contain the pore/chain along the trajectory. <br />
-&nbsp;&nbsp; |- `psf`: Path to the corresponding .psf file. By that, we mean it should match the atoms contained in the .dcd file <br />
-&nbsp;&nbsp; |- `bin`: Optional: A three-column argument. The first is the number of bins. The second and third are the lower and upper Z position for binning the pore. Defaults to [100, -20, 20] <br />
-&nbsp;&nbsp; |- `sel`: Optional: A selection in VMD-like format. It's most useful when the .dcd trajectory is not correctly pre-processed to isolate the chain/pore. Defaults to `protein`.<br />
-&nbsp;&nbsp; |- `out`: Optional: A path and/or name for the output file to be saved. Defaults to `outFile.dat` <br />
-&nbsp;&nbsp; |- `keep`: Optional: A keyword to mark whether to keep or delete HOLE intermediate files. If present, files are kept. Remove the keyword to delete HOLE files when calculations are finished. Defaults to `False` if not present.
+The script wraps trajectories, centers them, and analyzes them.<br/>
+Execution of the python script can be achieved by running `python permeationEvents.py -i inputFile.in`<br/>
+The input file for `permeationEvents.py` should contain:<br />
+&nbsp;&nbsp; |- `dcd`: Path to the `.dcd` file. WARNING: This has not been tested with an already wrapped trajectory. <br />
+&nbsp;&nbsp; |- `pdb`: Path to the corresponding .pdb file. <br />
+&nbsp;&nbsp; |- `upperZ`: Upper Z coordinate of the pore's bounding cylinder in the reference pdb structure. <br />
+&nbsp;&nbsp; |- `lowerZ`: Lower Z coordinate of the pore's bounding cylinder in the reference pdb structure. <br />
+&nbsp;&nbsp; |- `rad`: Radius of the bounding cylinder, measured in \[Angstrom] <br />
+&nbsp;&nbsp; |- `ref`: VMD-like selection of the elements used for alignment between each frame in the trajectory and the reference structure. <br/>
+&nbsp;&nbsp; |- `sel`: VMD-like selection of the atoms or molecules whose permeation will be counted. E.g: `resname CLA` .<br/>
+&nbsp;&nbsp; |- `out`: \[Optional] Path and name of the output file.
