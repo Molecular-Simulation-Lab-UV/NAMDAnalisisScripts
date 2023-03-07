@@ -1,4 +1,4 @@
-(https://img.shields.io/badge/status-testing-yellow)
+![](https://img.shields.io/badge/status-testing-yellow)
 
 # Batch HOLE analysis
 
