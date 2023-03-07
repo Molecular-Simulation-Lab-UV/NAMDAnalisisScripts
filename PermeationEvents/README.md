@@ -4,7 +4,7 @@
 # Permeation Events count
 
 ## Permeation events
-To count permeation events, we consider a cylinder as the definition of the pore through which the atom or molecule of interest permeates. So, we define permeation events as the transit of an atom or molecule from one side of that cylinder to the other, passing through said cylinder. Its long axis is always parallel to the simulations' Z axis, and the raidus in a plane parallel to that of the membrane (XY plane). <br />
+To count permeation events, we consider a cylinder as the definition of the pore through which the atom or molecule of interest permeates. So, we define permeation events as the transit of an atom or molecule from one side of that cylinder to the other, passing through said cylinder. Its long axis is always parallel to the simulations' Z axis, and the radius is on a plane parallel to that of the membrane (XY plane). <br />
 
 ## Running the program
 REMEMBER TO LIMIT YOUR VISIBLE CPUs!<br />
