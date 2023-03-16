@@ -113,7 +113,7 @@ if len(selName) > 2:
     for key in selName:
         selections.append(pdb.select(selName[key]))
 else:
-    selections = list(pdb.select(selName[list(selName.keys())[-1]]))
+    selections = list(pdb.select(selName[selName.keys()[-1]]))
 
 print('\nBeginning distance calculations for {0} frames'.format(len(traj)))
 t1 = datetime.now()
