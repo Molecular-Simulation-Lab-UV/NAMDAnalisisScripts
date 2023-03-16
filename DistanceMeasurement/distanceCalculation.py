@@ -108,12 +108,15 @@ def calc2D(sel1, sel2):
 # calculated against.
 refSel = pdb.select(mainSel)
 
-if len(selName) > 2:
+if len(selName) > 1:
     selections = []
     for key in selName:
         selections.append(pdb.select(selName[key]))
-else:
+elif len(selName) == 1:
     selections = list(pdb.select(selName[list(selName.keys())[-1]]))
+else:
+    print('Error: at least two selections are needed to calculate a distance')
+    exit()
 
 print('\nBeginning distance calculations for {0} frames'.format(len(traj)))
 t1 = datetime.now()
