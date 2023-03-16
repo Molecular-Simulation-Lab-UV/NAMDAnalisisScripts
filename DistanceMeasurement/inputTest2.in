@@ -1,0 +1,6 @@
+pdb	../../Stuff/FaPIP21.POPC.Wat.box.ion.pdb
+dcd1	../../Stuff/eq6.10k_11500.dcd
+ref	protein and name CA
+sel1	resid 106 and name CD
+sel2	name CA and resid 95 110 185
+out	testing.out
