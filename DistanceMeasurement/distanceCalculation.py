@@ -137,9 +137,9 @@ elif dim == 3:
         for j, sel in enumerate(selections):
             if len(sel) > 1 and len(refSel) > 1:
                 distArray[i,j] = prody.calcDistance(prody.calcCenter(refSel), prody.calcCenter(sel))
-            elif len(sel) < 1 and len(refSel) > 1:
+            elif len(sel) == 1 and len(refSel) > 1:
                 distArray[i,j] = prody.calcDistance(prody.calcCenter(refSel), sel.getCoords())
-            elif len(sel) > 1 and len(refSel) < 1:
+            elif len(sel) > 1 and len(refSel) == 1:
                 distArray[i,j] = prody.calcDistance(refSel.getCoords(), prody.calcCenter(sel))
             else:
                 distArray[i,j] = prody.calcDistance(refSel.getCoords(), sel.getCoords())
