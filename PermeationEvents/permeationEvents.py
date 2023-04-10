@@ -62,7 +62,7 @@ traj.setCoords(pdb)
 traj.setAtoms(pdb.select(refName)) # refName = Selection used when aligning frames (frame.superpose())
 atomsSelection = pdb.select(selName)
 
-NN = 3
+NN = 3 # Counting in z+ direction, z- direction, and total events: that's the 3
 
 atomIDs = atomsSelection.getIndices() # "sel" selection. Usually would be "name OH2".
 
@@ -78,7 +78,7 @@ permArray simply holds the frame and the counts in each direction, as well as th
 diffArray holds the 'flags' ARRAY's index (not the atom's index!) of the differing flags.
 """
 flagsOld = numpy.zeros((len(atomsSelection), 2))
-permArray = numpy.zeros((len(traj), NN)) # Array containing the counters for permeation in each direction, according to NN (line 67 of the script)
+permArray = numpy.zeros((len(traj), NN)) # Array containing the counters for permeation in each direction, according to NN (line 65 of the script)
 permArray = numpy.hstack((numpy.linspace(1, len(traj), len(traj))[:,numpy.newaxis], permArray)).astype('int')
 
 t1 = datetime.now()
@@ -99,12 +99,12 @@ for i, frame in enumerate(traj):
     except:
         continue
     for value in diffArray:
-        if 2 - flagsOld[value, -2] + flags[value] == 7:
+        if (numpy.append(flagsOld[value], flags[value]) == [1,3,6]).all():
             counter[0] += 1
-        elif 2 - flagsOld[value, -2] + flags[value] == -3:
+        elif (numpy.append(flagsOld[value], flags[value]) == [6,3,1]).all():
             counter[1] += 1
             
-            # Update the counters and flagsOld's flags.
+        # Update the counters and flagsOld's flags.
 
         permArray[i,-3] = counter[1] # Direction -z
         permArray[i,-2] = counter[0] # Direction +z
