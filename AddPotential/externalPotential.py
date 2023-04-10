@@ -15,7 +15,7 @@ arg = parser.parse_args()
 dx = gridData.Grid(arg.in_file)
 finalDX = dx.grid.copy()
 
-cF = 1/(0.0862*arg.temp) # Conversion factor @ 300 Kelvin
+cF = 1/(0.0862*arg.temp) # Conversion factor @ arg.temp Kelvin
 
 if arg.field > 0:
     # FALTA TRANSFORMARLO A UNIDADES NAMD

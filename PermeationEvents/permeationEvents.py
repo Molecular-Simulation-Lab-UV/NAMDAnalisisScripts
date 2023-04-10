@@ -94,7 +94,10 @@ for i, frame in enumerate(traj):
     flags = numpy.where((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ), 3*numpy.ones(len(posArray)), flags)
     flags = flags.T # Transpose the flags array to get it from shape (, len(posArray)) to (len(posArray),).
     
-    diffArray = numpy.concatenate(numpy.argwhere(flags - flagsOld[:,-1] != 0)) # Explained a while back.
+    try:
+        diffArray = numpy.concatenate(numpy.argwhere(flags - flagsOld[:,-1] != 0)) # Explained a while back.
+    except:
+        continue
     for value in diffArray:
         if 2 - flagsOld[value, -2] + flags[value] == 7:
             counter[0] += 1
