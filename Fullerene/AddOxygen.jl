@@ -106,11 +106,21 @@ bonds = []
 # Store new atoms
 oxygens = []
 hydrogens = []
-index = natoms  # Will be used to numper oxygens and hydrogens
+serial = natoms  # Will be used to numper oxygens and hydrogens
 # for all atoms check closest three
 for i in modify
-    global index
-    index += 1 # First oxygen is numbered after the last carbon.
+    # Data to store in atom
+    global serial
+    serial += 1 # First oxygen is numbered after the last carbon.
+    altLoc = atoms[i].altLoc
+    resName = atoms[i].resName
+    chainID = atoms[i].chainID
+    resSeq = atoms[i].resSeq
+    iCode = atoms[i].iCode
+    occupancy = 0.0
+    beta = 0.0
+    charge = atoms[i].charge
+    # Define plane
     closest_dist = sort(distances[i])[2:4]  # 1 is itself, 2:4 are the closest three atoms
     inds = [findfirst(x -> x == closest_dist[j], distances[i]) for j in 1:3]
     normal = getnormal(atoms[inds]...)
@@ -124,16 +134,16 @@ for i in modify
     nphi = sign(normal[2]) * acos(normal[1] / sqrt(normal[1]^2 + normal[2]^2))
     # Oxygen: just add normal vector * bond length to the atom
     x, y, z = [atoms[i].x, atoms[i].y, atoms[i].z] + normal * pargs["bondCO"]
-    Oxygen = Atom(index, "O", "X", 1, x, y, z, atoms[i].occupancy, atoms[i].beta, "O")
+    Oxygen = Atom("ATOM", serial, "O", altLoc, resName, chainID, resSeq, iCode, x, y, z, occupancy, beta, "O", charge)
     # Store
     push!(oxygens, Oxygen)
-    index += 1
+    serial += 1
     # Hydrogen: Set it with angle relative to the normal vector
     new_theta = ntheta + (π - angle)
     x = x + (pargs["bondOH"] * sin(new_theta) * cos(nphi))
     y = y + (pargs["bondOH"] * sin(new_theta) * sin(nphi))
     z = z + (pargs["bondOH"] * cos(new_theta))
-    Hydrogen = Atom(index, "H", "X", 1, x, y, z, atoms[i].occupancy, atoms[i].beta, "H")
+    Hydrogen = Atom("ATOM", serial, "H", altLoc, resName, chainID, resSeq, iCode, x, y, z, occupancy, beta, "H", charge)
     # Store
     push!(hydrogens, Hydrogen)
 end
