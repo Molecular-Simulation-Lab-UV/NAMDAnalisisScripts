@@ -22,12 +22,6 @@ import Base.Vector
 
 ### Argument partsing
 
-## We create our own parsing for an Int array
-
-# function ArgParse.parse_item(::Type{Array{Int}}, x::AbstractString)
-#     return [parse(Int, i) for i in split(x)]
-# end
-
 s = ArgParseSettings(description=desc)
 @add_arg_table! s begin
     "file"
