@@ -1,6 +1,8 @@
 #!/bin/julia
 desc = """
   Takes a pdb file of an unsubstituted fullerene and adds oxygens at the requested points
+  Must pass either a list of indexes with -i or an amount of OH to generate with -r.
+  If both are passed, -i takes priority.
 
   Examples:
 
@@ -15,12 +17,12 @@ desc = """
   by Mateo Barria-Urenda
 """
 
-using LinearAlgebra
+using LinearAlgebra  #  Cross product to get a plane normal
 using ArgParse  # To manage inputs
-using Random
-import Base.Vector
+using Random  # Random angle for C-O-H and random distribution of -OH
+import Base.Vector  # Type conversion
 
-### Argument partsing
+# Argument parsing
 
 s = ArgParseSettings(description=desc)
 @add_arg_table! s begin
@@ -51,15 +53,16 @@ s = ArgParseSettings(description=desc)
         # default = 108.
         default = 130.
 end
+
 pargs = parse_args(s)
-println(typeof(pargs["indexes"]))
-println(typeof(pargs["random"]))
+
+# Need at least indexes or random
 if (length(pargs["indexes"]) < 1 && pargs["random"] == nothing)
     throw(ArgumentError("Must pass either --indexes or --random"))
 end
 
 angle = pargs["angle"]
-angle = angle / 180 * π
+angle = angle / 180 * π  # Convert to radians
 
 """
 Atom(id, name, rescha, resid, x, y, z, occupancy, beta, atom)
@@ -174,7 +177,6 @@ end
 # Number of atoms
 natoms = length(atoms)
 
-# Enforce type
 # Check which to modify
 if  length(pargs["indexes"]) > 0
     modify = pargs["indexes"]
@@ -192,20 +194,20 @@ distances = [[dist(atoms[i], atoms[j])  for j in 1:natoms] for i in 1:natoms]
 
 # Store all bonds
 bonds = []
-
-# for all atoms check closest three
-index = natoms
+# Store new atoms
 oxygens = []
 hydrogens = []
+index = natoms  # Will be used to numper oxygens and hydrogens
+# for all atoms check closest three
 for i in modify
     global index
-    index += 1 # How to save it
-    closest_dist = sort(distances[i])[2:4]  # 1 is itself
+    index += 1 # First oxygen is numbered after the last carbon.
+    closest_dist = sort(distances[i])[2:4]  # 1 is itself, 2:4 are the closest three atoms
     inds = [findfirst(x -> x == closest_dist[j], distances[i]) for j in 1:3]
     normal = getnormal(atoms[inds]...)
     dir = dot(Vector(atoms[i]), normal)  # Compare normal to our carbon
     if dir < 0
-        normal *= -1  # Flip in these cases
+        normal *= -1  # Flip normal in these cases
     end
     nr = norm(normal)  # length of normal vector, should be 1
     # angles of normal vector
@@ -214,6 +216,7 @@ for i in modify
     # Oxygen: just add normal vector * bond length to the atom
     x, y, z = [atoms[i].x, atoms[i].y, atoms[i].z] + normal * pargs["bondCO"]
     Oxygen = Atom(index, "O", "X", 1, x, y, z, atoms[i].occupancy, atoms[i].beta, "O")
+    # Store
     push!(oxygens, Oxygen)
     index += 1
     # Hydrogen: Set it with angle relative to the normal vector
@@ -222,6 +225,7 @@ for i in modify
     y = y + (pargs["bondOH"] * sin(new_theta) * sin(nphi))
     z = z + (pargs["bondOH"] * cos(new_theta))
     Hydrogen = Atom(index, "H", "X", 1, x, y, z, atoms[i].occupancy, atoms[i].beta, "H")
+    # Store
     push!(hydrogens, Hydrogen)
 end
 
