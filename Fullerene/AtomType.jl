@@ -32,6 +32,7 @@ struct Atom
     z::Float64
     occupancy::Float64
     beta::Float64
+    segment::String
     element::String
     charge::String
 end
@@ -71,6 +72,7 @@ function Atom(line::String)::Atom
     z = parse(Float64, get_range(47, 54))
     occupancy = parse(Float64, get_range(55, 60))
     beta = parse(Float64, get_range(61, 66))
+    segment = get_range(73, 76)
     element = get_range(77, 78)
     charge = get_range(79, 80)
 
@@ -87,6 +89,7 @@ function Atom(line::String)::Atom
         z,
         occupancy,
         beta,
+        segment,
         element,
         charge)
 end
@@ -165,7 +168,8 @@ function atom2pdb(A::Atom)
     line *= format_length(z, 8)
     line *= format_length(occupancy, 6)
     line *= format_length(beta, 6)
-    line *= " "^10
+    line *= " "^6
+    line *= format_length(A.segment, 4, false)
     line *= format_length(A.element, 2)
     line *= format_length(A.charge, 2)
     return line * "\n"
