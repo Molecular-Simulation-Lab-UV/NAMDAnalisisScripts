@@ -184,8 +184,12 @@ sort!(dihedrals)
 
 # Writeout new pdb
 open(pargs["outname"] * ".psf", "w") do io
+    # !NTITLE
+    write(io, "PSF\n\n\n       1 !NTITLE\n REMARKS generated with MakePSF.jl\n\n")
+    # !NATOM
     write(io, format_length(natoms, 8) * " !NATOM\n")
     for a in atoms
+        # TODO!! Change charges to something that is not 0
         elmnt = strip(a.element)
         if elmnt == "C"
             write(io, atom2psf(a, "CA", 0.0, 12.011))
@@ -197,4 +201,72 @@ open(pargs["outname"] * ".psf", "w") do io
             println("Skipping unrecognized element $elmnt")
         end
     end
+    write(io, "\n")
+    # !NBOND
+    nbond = length(bonds)
+    write(io, format_length(natoms, 8) * " !NBOND: bonds\n")
+    full_lines = Int(nbond ÷ 4)
+    for i in 0:(full_lines-1)
+        line = ""
+        for j in 1:4
+            line *= format_length(bonds[i*4+j][1], 8)
+            line *= format_length(bonds[i*4+j][2], 8)
+        end
+        write(io, line * "\n")
+    end
+    line = ""
+    for j in 1:Int(nbond % 4)
+        line *= format_length(bonds[full_lines*4+j][1], 8)
+        line *= format_length(bonds[full_lines*4+j][2], 8)
+    end
+    write(io, line * "\n")
+    write(io, "\n")
+    # !NTHETA
+    ntheta = length(angles)
+    write(io, format_length(natoms, 8) * " !NTHETA: angles\n")
+    full_lines = Int(ntheta ÷ 3)
+    for i in 0:(full_lines-1)
+        line = ""
+        for j in 1:3
+            line *= format_length(angles[i*3+j][1], 8)
+            line *= format_length(angles[i*3+j][2], 8)
+            line *= format_length(angles[i*3+j][3], 8)
+        end
+        write(io, line * "\n")
+    end
+    line = ""
+    for j in 1:Int(ntheta % 3)
+        line *= format_length(angles[full_lines*3+j][1], 8)
+        line *= format_length(angles[full_lines*3+j][2], 8)
+        line *= format_length(angles[full_lines*3+j][3], 8)
+    end
+    write(io, line * "\n")
+    write(io, "\n")
+    # !NPHI
+    nphi = length(dihedrals)
+    write(io, format_length(natoms, 8) * " !NPHI: dihedrals\n")
+    full_lines = Int(ntheta ÷ 2)
+    for i in 0:(full_lines-1)
+        line = ""
+        for j in 1:2
+            line *= format_length(dihedrals[i*2+j][1], 8)
+            line *= format_length(dihedrals[i*2+j][2], 8)
+            line *= format_length(dihedrals[i*2+j][3], 8)
+            line *= format_length(dihedrals[i*2+j][4], 8)
+        end
+        write(io, line * "\n")
+    end
+    line = ""
+    for j in 1:Int(ntheta % 2)
+        line *= format_length(angles[full_lines*2+j][1], 8)
+        line *= format_length(angles[full_lines*2+j][2], 8)
+        line *= format_length(angles[full_lines*2+j][3], 8)
+        line *= format_length(angles[full_lines*2+j][4], 8)
+    end
+    write(io, line * "\n")
+    write(io, "\n")
+    write(io, "        0 !NIMPHI: impropers\n")
+    write(io, "\n")
+    write(io, "        0 !NRCTERM: cross-terms\n")
+    write(io, "\n")
 end
