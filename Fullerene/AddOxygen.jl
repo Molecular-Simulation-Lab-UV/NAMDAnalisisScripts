@@ -153,11 +153,11 @@ open(pargs["outfile"], "w") do io
     global header
     write(io, header * "\n")
     for atom in atoms
-        write(io, atom2line(atom))
+        write(io, atom2pdb(atom))
     end
     for i in 1:length(oxygens)
-        write(io, atom2line(oxygens[i]))
-        write(io, atom2line(hydrogens[i]))
+        write(io, atom2pdb(oxygens[i]))
+        write(io, atom2pdb(hydrogens[i]))
     end
     write(io, "END")
 end

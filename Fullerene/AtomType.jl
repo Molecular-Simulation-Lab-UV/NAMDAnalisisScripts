@@ -8,7 +8,7 @@
 
 module AtomType
 
-export Atom, atom2line, dist, getnormal
+export Atom, atom2pdb, dist, getnormal, atom2psf, format_length
 
 using LinearAlgebra  #  Cross product to get a plane normal
 import Base.Vector  # Type conversion
@@ -32,6 +32,7 @@ struct Atom
     z::Float64
     occupancy::Float64
     beta::Float64
+    segment::String
     element::String
     charge::String
 end
@@ -71,6 +72,7 @@ function Atom(line::String)::Atom
     z = parse(Float64, get_range(47, 54))
     occupancy = parse(Float64, get_range(55, 60))
     beta = parse(Float64, get_range(61, 66))
+    segment = get_range(73, 76)
     element = get_range(77, 78)
     charge = get_range(79, 80)
 
@@ -87,6 +89,7 @@ function Atom(line::String)::Atom
         z,
         occupancy,
         beta,
+        segment,
         element,
         charge)
 end
@@ -140,11 +143,11 @@ function format_name(name::AbstractString)
 end
 
 """
-atom2line(Atom)
+atom2pdb(Atom)
 
   Convert atom type back to a pdb file line.
 """
-function atom2line(A::Atom)
+function atom2pdb(A::Atom)
     # nshould be handle by format_length, but rounding is a bit better than truncating so
     x, y, z = round.([A.x, A.y, A.z], digits=3)
     occupancy, beta = round.([A.occupancy, A.beta], digits=2)
@@ -165,10 +168,33 @@ function atom2line(A::Atom)
     line *= format_length(z, 8)
     line *= format_length(occupancy, 6)
     line *= format_length(beta, 6)
-    line *= " "^10
+    line *= " "^6
+    line *= format_length(A.segment, 4, false)
     line *= format_length(A.element, 2)
     line *= format_length(A.charge, 2)
     return line * "\n"
+end
+
+"""
+atom2psf(Atom, type, charge, mass)
+
+  Convert atom type back to a psf file line.
+"""
+function atom2psf(A::Atom, type::String, charge::Float64, mass::Float64)
+    line = format_length(A.serial, 8)
+    line *= format_length(A.segment, 4)
+    line *= format_length(A.resSeq, 3)
+    line *= format_length(A.resName, 7)
+    line *= " "^2
+    line *= format_length(A.name, 4, false)
+    line *= " "
+    line *= format_length(type, 4, false)
+    line *= " "^2
+    line *= format_length(round(charge, digits=6), 9)
+    line *= " "^6
+    line *= format_length(round(mass, digits=4), 8)
+    line *= "           0\n"
+    return line
 end
 
 """
