@@ -8,7 +8,7 @@
 
 module AtomType
 
-export Atom, atom2line, dist, getnormal
+export Atom, atom2pdb, dist, getnormal
 
 using LinearAlgebra  #  Cross product to get a plane normal
 import Base.Vector  # Type conversion
@@ -140,11 +140,11 @@ function format_name(name::AbstractString)
 end
 
 """
-atom2line(Atom)
+atom2pdb(Atom)
 
   Convert atom type back to a pdb file line.
 """
-function atom2line(A::Atom)
+function atom2pdb(A::Atom)
     # nshould be handle by format_length, but rounding is a bit better than truncating so
     x, y, z = round.([A.x, A.y, A.z], digits=3)
     occupancy, beta = round.([A.occupancy, A.beta], digits=2)
