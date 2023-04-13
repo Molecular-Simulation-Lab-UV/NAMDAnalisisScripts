@@ -26,7 +26,7 @@ end
 pargs = parse_args(s)
 
 # Store atoms
-atoms = []
+atoms = Atom[]
 header = ""
 # Read from file
 open(pargs["file"]) do io
@@ -52,12 +52,12 @@ for i in 1:natoms
     a = atoms[i]
     # General changes
     altLoc = " "
-    resName = "FULL"
+    resName = "FUL"
     chainID = "F"
     resSeq = 1
     beta = 0
     occupancy = 0
-    segment = "FULL"
+    segment = "FUL"
     # Element specific
     elmnt = strip(a.element)
     if elmnt == "C"
@@ -180,6 +180,21 @@ end
 
 sort!(dihedrals)
 
-println(bonds)
-println(angles)
-println(dihedrals)
+
+
+# Writeout new pdb
+open(pargs["outname"] * ".psf", "w") do io
+    write(io, format_length(natoms, 8) * " !NATOM\n")
+    for a in atoms
+        elmnt = strip(a.element)
+        if elmnt == "C"
+            write(io, atom2psf(a, "CA", 0.0, 12.011))
+        elseif elmnt == "O"
+            write(io, atom2psf(a, "OH1", 0.0, 15.999))
+        elseif elmnt == "H"
+            write(io, atom2psf(a, "H", 0.0, 1.008))
+        else
+            println("Skipping unrecognized element $elmnt")
+        end
+    end
+end

@@ -8,7 +8,7 @@
 
 module AtomType
 
-export Atom, atom2pdb, dist, getnormal
+export Atom, atom2pdb, dist, getnormal, atom2psf, format_length
 
 using LinearAlgebra  #  Cross product to get a plane normal
 import Base.Vector  # Type conversion
@@ -173,6 +173,28 @@ function atom2pdb(A::Atom)
     line *= format_length(A.element, 2)
     line *= format_length(A.charge, 2)
     return line * "\n"
+end
+
+"""
+atom2psf(Atom, type, charge, mass)
+
+  Convert atom type back to a psf file line.
+"""
+function atom2psf(A::Atom, type::String, charge::Float64, mass::Float64)
+    line = format_length(A.serial, 8)
+    line *= format_length(A.segment, 4)
+    line *= format_length(A.resSeq, 3)
+    line *= format_length(A.resName, 7)
+    line *= " "^2
+    line *= format_length(A.name, 4, false)
+    line *= " "
+    line *= format_length(type, 4, false)
+    line *= " "^2
+    line *= format_length(round(charge, digits=6), 9)
+    line *= " "^6
+    line *= format_length(round(mass, digits=4), 8)
+    line *= "           0\n"
+    return line
 end
 
 """
