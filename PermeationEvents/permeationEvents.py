@@ -15,6 +15,7 @@ parser.add_argument('-i', '--in_file', type = str, required = True, help = 'Path
 arg = parser.parse_args()
 inFile = open(arg.in_file, 'r')
 
+delta = 4
 dcdName = []
 outName = 'outFile.out'
 
@@ -61,6 +62,7 @@ traj.link(pdb)
 traj.setCoords(pdb)
 traj.setAtoms(pdb.select(refName)) # refName = Selection used when aligning frames (frame.superpose())
 atomsSelection = pdb.select(selName)
+lenSel = len(atomsSelection)
 
 NN = 3 # Counting in z+ direction, z- direction, and total events: that's the 3
 
@@ -77,7 +79,7 @@ The corresponding element [frameNumber, -1] gets updated when it differs from th
 permArray simply holds the frame and the counts in each direction, as well as the total.
 diffArray holds the 'flags' ARRAY's index (not the atom's index!) of the differing flags.
 """
-flagsOld = numpy.zeros((len(atomsSelection), 2))
+flagsOld = numpy.zeros((lenSel, 2))
 permArray = numpy.zeros((len(traj), NN)) # Array containing the counters for permeation in each direction, according to NN (line 65 of the script)
 permArray = numpy.hstack((numpy.linspace(1, len(traj), len(traj))[:,numpy.newaxis], permArray)).astype('int')
 
@@ -89,30 +91,36 @@ for i, frame in enumerate(traj):
     frame.superpose()
     posArray = pdb.select(selName).getCoords()
     # Flag atoms with postion z > 0 with 6, and z < 0 with 1
-    flags = numpy.where(posArray[:,2] < 0, numpy.ones(len(posArray)), 6*numpy.ones(len(posArray)))
+    flags = numpy.where(posArray[:,2] < 0, numpy.ones(lenSel), 5*numpy.ones(lenSel))
     # Include the flags for the atoms inside the cylinder
-    flags = numpy.where((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > loZ), 3*numpy.ones(len(posArray)), flags)
+    flags = numpy.where(numpy.logical_and(posArray[:,2] < upZ - delta, posArray[:,2] > loZ + delta), 3*numpy.ones(lenSel), flags)
+    flags = numpy.where((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < upZ) & (posArray[:,2] > upZ - delta), 4*numpy.ones(lenSel), flags)
+    flags = numpy.where((numpy.sqrt(posArray[:,0]**2 + posArray[:,1]**2) < rad) & (posArray[:,2] < loZ + delta) & (posArray[:,2] > loZ), 2*numpy.ones(lenSel), flags)
     flags = flags.T # Transpose the flags array to get it from shape (, len(posArray)) to (len(posArray),).
-    
+    mask = numpy.flatnonzero(numpy.logical_or(flags == 1, flags == 5))
+
     try:
-        diffArray = numpy.concatenate(numpy.argwhere(flags - flagsOld[:,-1] != 0)) # Explained a while back.
+        diffArray = numpy.flatnonzero(numpy.all(numpy.isin(flagsOld[:, 1:], flags, invert = True), axis = 1)) # Explained a while back.
     except:
         continue
     for value in diffArray:
-        if (numpy.append(flagsOld[value], flags[value]) == [1,3,6]).all():
-            counter[0] += 1
-        elif (numpy.append(flagsOld[value], flags[value]) == [6,3,1]).all():
+        if (numpy.append(flagsOld[value], flags[value]) == [1,2,3,4,5]).all():
             counter[1] += 1
+        elif (numpy.append(flagsOld[value], flags[value]) == [5,4,3,2,1]).all():
+            counter[0] += 1
             
         # Update the counters and flagsOld's flags.
 
-        permArray[i,-3] = counter[1] # Direction -z
-        permArray[i,-2] = counter[0] # Direction +z
+        # permArray[i,-3] = counter[1] # Direction +z
+        # permArray[i,-2] = counter[0] # Direction -z
+        permArray[i, -3:-1] = counter
         permArray[i,-1] = counter[0] + counter[1] # Total count
         # Push flagsOld flags (for the specific atomIndex) to make place for the updated one
-        flagsOld[value] = numpy.roll(flagsOld[value],-1)
-        flagsOld[value,-1] = flags[value] # Update flags from flagsOld
-
+        # flagsOld[value] = numpy.roll(flagsOld[value],-1)
+        # flagsOld[value,-1] = flags[value] # Update flags in flagsOld
+    flagsOld[diffArray] = numpy.roll(flagsOld[diffArray], -1)
+    flagsOld[diffArray, -1] = flags[diffArray]
+    flagsOld[mask] = numpy.hstack((numpy.zeros(len(mask),3), flags[mask])) # Possible optimization here; the "try" statement could be shortened by avoiding the inclusion of the indices where flags == 5 or flags == 1.
 
 permArray = permArray.astype('str') # Handy for writing to a file
 
