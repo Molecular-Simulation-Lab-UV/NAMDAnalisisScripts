@@ -120,6 +120,7 @@ for i in modify
     occupancy = 0.0
     beta = 0.0
     charge = atoms[i].charge
+    segment = atoms[i].segment
     # Define plane
     closest_dist = sort(distances[i])[2:4]  # 1 is itself, 2:4 are the closest three atoms
     inds = [findfirst(x -> x == closest_dist[j], distances[i]) for j in 1:3]
@@ -134,7 +135,7 @@ for i in modify
     nphi = sign(normal[2]) * acos(normal[1] / sqrt(normal[1]^2 + normal[2]^2))
     # Oxygen: just add normal vector * bond length to the atom
     x, y, z = [atoms[i].x, atoms[i].y, atoms[i].z] + normal * pargs["bondCO"]
-    Oxygen = Atom("ATOM", serial, "O", altLoc, resName, chainID, resSeq, iCode, x, y, z, occupancy, beta, "O", charge)
+    Oxygen = Atom("ATOM", serial, "O", altLoc, resName, chainID, resSeq, iCode, x, y, z, occupancy, beta, segment, "O", charge)
     # Store
     push!(oxygens, Oxygen)
     serial += 1
@@ -143,7 +144,7 @@ for i in modify
     x = x + (pargs["bondOH"] * sin(new_theta) * cos(nphi))
     y = y + (pargs["bondOH"] * sin(new_theta) * sin(nphi))
     z = z + (pargs["bondOH"] * cos(new_theta))
-    Hydrogen = Atom("ATOM", serial, "H", altLoc, resName, chainID, resSeq, iCode, x, y, z, occupancy, beta, "H", charge)
+    Hydrogen = Atom("ATOM", serial, "H", altLoc, resName, chainID, resSeq, iCode, x, y, z, occupancy, beta, segment, "H", charge)
     # Store
     push!(hydrogens, Hydrogen)
 end
