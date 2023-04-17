@@ -204,7 +204,7 @@ open(pargs["outname"] * ".psf", "w") do io
     write(io, "\n")
     # !NBOND
     nbond = length(bonds)
-    write(io, format_length(natoms, 8) * " !NBOND: bonds\n")
+    write(io, format_length(nbond, 8) * " !NBOND: bonds\n")
     full_lines = Int(nbond ÷ 4)
     for i in 0:(full_lines-1)
         line = ""
@@ -223,7 +223,7 @@ open(pargs["outname"] * ".psf", "w") do io
     write(io, "\n")
     # !NTHETA
     ntheta = length(angles)
-    write(io, format_length(natoms, 8) * " !NTHETA: angles\n")
+    write(io, format_length(ntheta, 8) * " !NTHETA: angles\n")
     full_lines = Int(ntheta ÷ 3)
     for i in 0:(full_lines-1)
         line = ""
@@ -244,7 +244,7 @@ open(pargs["outname"] * ".psf", "w") do io
     write(io, "\n")
     # !NPHI
     nphi = length(dihedrals)
-    write(io, format_length(natoms, 8) * " !NPHI: dihedrals\n")
+    write(io, format_length(nphi, 8) * " !NPHI: dihedrals\n")
     full_lines = Int(ntheta ÷ 2)
     for i in 0:(full_lines-1)
         line = ""
