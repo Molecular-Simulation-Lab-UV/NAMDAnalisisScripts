@@ -267,6 +267,6 @@ open(pargs["outname"] * ".psf", "w") do io
     write(io, "\n")
     write(io, "        0 !NIMPHI: impropers\n")
     write(io, "\n")
-    write(io, "        0 !NRCTERM: cross-terms\n")
+    write(io, "        0 !NCRTERM: cross-terms\n")
     write(io, "\n")
 end
