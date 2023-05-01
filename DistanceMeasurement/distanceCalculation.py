@@ -49,7 +49,7 @@ for line in inFile:
             refName = l[1]
     elif l[0] == 'pdb':
         pdbName = l[1]
-    elif 'sel' in l[0] or 'Sel' in l[0] or 'SEL' in l[0]:
+    elif 'sel' in l[0].lower(): # "sel" keywords MUST be distinct from one another for this to work (e.g: sel1, sel2, etc)
         if len(l[1:]) > 1 and mainSel == None:
             mainSel = ' '.join(l[1:])
         elif len(l[1:]) > 0 and mainSel != None:
@@ -107,14 +107,45 @@ def calc2D(sel1, sel2):
 
 # Set the first element as the one which all distance measurements will be
 # calculated against.
-refSel = pdb.select(mainSel)
-
+# Check and correct an internal prody error: "segname" is not correctly parsed as selection with the pdb.select() method
+# so we're bypassing it now.
+if 'segname' in mainSel:
+    portion1 = mainSel.split('segname')
+    for i in range(len(portion1)-1):
+        mainSeg = portion1[i+1].split()[0]
+        portion2 = portion1[i+1].split()
+        portion2.pop(0)
+        try:
+            portion2.remove('and')
+        except:
+            pass
+        portion3 = portion1[0].split() + portion2
+    refsel = pdb[mainSeg].select(portion3)
+else:
+    refSel = pdb.select(mainSel)
+    
 print(refSel)
 
 selections = []
 for key in selName:
-    selections.append(pdb.select(selName[key]))
+    if 'segname' in selName[key]:
+        portion1 = selName[key].split('segname')
+        for i in range(len(portion1)-1):
+            seg = portion1[i+1].split()[0]
+            portion2 = portion1[i+1].split()
+            portion2.pop(0)
+            try:
+                portion2.remove('and')
+            except:
+                pass
+            portion3 = portion1[0].split() + portion2
+        selections = pdb[seg].select(portion3)
+    else:
+        selections.append(pdb.select(selName[key]))
 
+print('\nSelections considered for calculation are\n')
+print(selections)
+print('\n')
 print('\nBeginning distance calculations for {0} frames'.format(len(traj)))
 t1 = datetime.now()
 
