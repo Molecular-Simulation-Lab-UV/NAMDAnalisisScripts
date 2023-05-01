@@ -135,7 +135,7 @@ if 'segname' in mainSel:
         except:
             pass
         portion3 = portion1[0].split() + portion2
-    refsel = pdb[mainSeg].select(' '.join(portion3))
+    refSel = pdb[mainSeg].select(' '.join(portion3))
 else:
     refSel = pdb.select(mainSel)
 
