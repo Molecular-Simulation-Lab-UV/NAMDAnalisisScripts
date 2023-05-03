@@ -68,12 +68,15 @@ countArray[:,0] = numpy.linspace(1, len(traj), len(traj))
 for i, frame in enumerate(traj):
     prody.wrapAtoms(pdb, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
     frame.superpose()
-    mainSelCoords = mainSel.getCoords()
-    secondSelCoords = secondSel.getCoords()
-    diffArray = mainSelCoords[:, numpy.newaxis, :] - secondSelCoords[numpy.newaxis, :, :]
-    diffArrayNorm = numpy.linalg.norm(diffArray)
-    numContacts = len(numpy.flatnonzero(numpy.argwhere(diffArrayNorm < thrshld)))
-    countArray[i,1] = numContacts
+    selContacts = prody.Contacts(mainSel)
+    contacts = selContacts.select(thrshld, secondSel)
+    # mainSelCoords = mainSel.getCoords()
+    # secondSelCoords = secondSel.getCoords()
+    # diffArray = mainSelCoords[:, numpy.newaxis, :] - secondSelCoords[numpy.newaxis, :, :]
+    # diffArrayNorm = numpy.linalg.norm(diffArray)
+    # numContacts = len(numpy.flatnonzero(numpy.argwhere(diffArrayNorm < thrshld)))
+    # countArray[i,1] = numContacts
+    countArray[i,1] = len(contacts)
 
 
 countArray = countArray.astype('str') # Handy for writing to a file
