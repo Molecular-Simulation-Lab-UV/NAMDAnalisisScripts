@@ -71,7 +71,7 @@ for i, frame in enumerate(traj):
     mainSelCoords = mainSel.getCoords()
     secondSelCoords = secondSel.getCoords()
     diffArray = mainSelCoords[:, numpy.newaxis, :] - secondSelCoords[numpy.newaxis, :, :]
-    diffArrayNorm = numpy.linalg.norm(diffArray)
+    diffArrayNorm = numpy.linalg.norm(diffArray, axis=2)
     numContacts = len(numpy.flatnonzero(numpy.argwhere(diffArrayNorm < thrshld)))
     countArray[i,1] = numContacts
 
