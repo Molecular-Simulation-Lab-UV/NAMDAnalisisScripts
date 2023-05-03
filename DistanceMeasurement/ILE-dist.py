@@ -25,7 +25,6 @@ else:
 #  Should usually go lower, but we put it here to be able to select multiple dcds and selections
 selName = {}
 dcdName = []
-mainSel = None
 
 # Standard outFile name to avoid error when writing. If set in the input file, the name will be replaced.
 outName = 'outFile.dat'
@@ -50,11 +49,11 @@ for line in inFile:
     elif l[0] == 'pdb':
         pdbName = l[1]
     elif 'sel' in l[0] or 'Sel' in l[0] or 'SEL' in l[0]:
-        if len(l[1:]) > 1 and mainSel == None:
+        if len(l[1]) > 1 and len(selName) == 0:
             mainSel = ' '.join(l[1:])
-        elif len(l[1:]) > 0 and mainSel != None:
+        elif len(l[1]) > 0 and len(selName) > 0:
             selName[l[0]] = ' '.join(l[1:])
-        elif len(l[1:]) < 2 and mainSel == None:
+        elif len(l[1]) < 2 and len(selName) == 0:
             mainSel = l[1]
         else:
             selName[l[0]] = l[1]
@@ -75,22 +74,7 @@ if len(dcdName) > 1:
 
 traj.link(pdb)
 traj.setCoords(pdb)
-
-if 'segname' in refName:
-    portion1 = refName.split('segname')
-    for i in range(len(portion1)-1):
-        refSeg = portion1[i+1].split()[0]
-        portion2 = portion1[i+1].split()
-        portion2.pop(0)
-        try:
-            portion2.remove('and')
-        except:
-            pass
-        portion3 = portion1[0].split() + portion2
-    traj.setAtoms(pdb[refSeg].select(' '.join(portion3)))
-else:
-    traj.setAtoms(pdb.select(refName))
-
+traj.setAtoms(pdb.select(refName))
 
 # Calculate Z distance between selections
 # This function returns the absolute value. You'll have to change the "return" at
@@ -122,45 +106,35 @@ def calc2D(sel1, sel2):
 
 # Set the first element as the one which all distance measurements will be
 # calculated against.
-
 refSel = pdb.select(mainSel)
-print(refSel)
 
-selections = []
-for key in selName:
-    selections.append(pdb.select(selName[key]))
+if len(selName) > 2:
+    selections = []
+    for key in selName:
+        selections.append(pdb.select(selName[key]))
+else:
+    selections = list(pdb.select(selName[selName.keys()[-1]]))
 
 print('\nBeginning distance calculations for {0} frames'.format(len(traj)))
 t1 = datetime.now()
 
 # Calculate the distances
-distArray = numpy.zeros((len(traj), len(selName)))
-print(distArray.shape)
+distArray = numpy.zeros((len(traj), len(selName[1:])))
 
-if dim == 1:
-    for i, frame in enumerate(traj):
-        frame.superpose()
+for i, frame in enumerate(traj):
+    frame.superpose()
+    if dim == 1:
         for j, sel in enumerate(selections):
             distArray[i,j] = calc1D(refSel, sel)
-elif dim == 2:
-    for i, frame in enumerate(traj):
-        frame.superpose()
+    elif dim == 2:
         for j, sel in enumerate(selections):
             distArray[i,j] = calc2D(refSel, sel)
-elif dim == 3:
-    for i, frame in enumerate(traj):
+    elif dim == 3:
         for j, sel in enumerate(selections):
-            if len(sel) > 1 and len(refSel) > 1:
-                distArray[i,j] = prody.calcDistance(prody.calcCenter(refSel), prody.calcCenter(sel))
-            elif len(sel) == 1 and len(refSel) > 1:
-                distArray[i,j] = prody.calcDistance(prody.calcCenter(refSel), sel.getCoords())
-            elif len(sel) > 1 and len(refSel) == 1:
-                distArray[i,j] = prody.calcDistance(refSel.getCoords(), prody.calcCenter(sel))
-            else:
-                distArray[i,j] = prody.calcDistance(refSel.getCoords(), sel.getCoords())
-
-else:
-    print('Something went wrong. Check dimension (-d) required (╯°□°)╯︵ ┻━┻')
+            distArray[i,j] = prody.calcDistance(prody.calcCenter(refSel), prody.calcCenter(sel))
+    else:
+        print('Something went wrong. Check dimension (-d) required (╯°□°)╯︵ ┻━┻')
+        break
 
 print('Done. Writing output file')
 
