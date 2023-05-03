@@ -75,7 +75,22 @@ if len(dcdName) > 1:
 
 traj.link(pdb)
 traj.setCoords(pdb)
-traj.setAtoms(pdb.select(refName))
+
+if 'segname' in refName:
+    portion1 = refName.split('segname')
+    for i in range(len(portion1)-1):
+        refSeg = portion1[i+1].split()[0]
+        portion2 = portion1[i+1].split()
+        portion2.pop(0)
+        try:
+            portion2.remove('and')
+        except:
+            pass
+        portion3 = portion1[0].split() + portion2
+    traj.setAtoms(pdb[refSeg].select(' '.join(portion3)))
+else:
+    traj.setAtoms(pdb.select(refName))
+
 
 # Calculate Z distance between selections
 # This function returns the absolute value. You'll have to change the "return" at
@@ -107,8 +122,8 @@ def calc2D(sel1, sel2):
 
 # Set the first element as the one which all distance measurements will be
 # calculated against.
-refSel = pdb.select(mainSel)
 
+refSel = pdb.select(mainSel)
 print(refSel)
 
 selections = []
