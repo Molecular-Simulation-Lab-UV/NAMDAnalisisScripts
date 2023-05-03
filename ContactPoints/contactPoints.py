@@ -78,7 +78,6 @@ for i, frame in enumerate(traj):
     # countArray[i,1] = numContacts
     countArray[i,1] = len(contacts)
 
-
 countArray = countArray.astype('str') # Handy for writing to a file
 outFile = open(outName, 'w+')
 outFile.write('# Frame \t\t Contacts count\n')
