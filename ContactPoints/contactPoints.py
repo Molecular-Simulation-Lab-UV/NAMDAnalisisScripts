@@ -70,12 +70,6 @@ for i, frame in enumerate(traj):
     frame.superpose()
     selContacts = prody.Contacts(mainSel)
     contacts = selContacts.select(thrshld, secondSel)
-    # mainSelCoords = mainSel.getCoords()
-    # secondSelCoords = secondSel.getCoords()
-    # diffArray = mainSelCoords[:, numpy.newaxis, :] - secondSelCoords[numpy.newaxis, :, :]
-    # diffArrayNorm = numpy.linalg.norm(diffArray)
-    # numContacts = len(numpy.flatnonzero(numpy.argwhere(diffArrayNorm < thrshld)))
-    # countArray[i,1] = numContacts
     try:
         countArray[i,1] = len(contacts)
     except:
