@@ -76,7 +76,7 @@ for i, frame in enumerate(traj):
     # diffArrayNorm = numpy.linalg.norm(diffArray)
     # numContacts = len(numpy.flatnonzero(numpy.argwhere(diffArrayNorm < thrshld)))
     # countArray[i,1] = numContacts
-    countArray[i,1] = len(contacts)
+    countArray[i,1] = len(contacts) if len(contacts) > 0 else 0
 
 countArray = countArray.astype('str') # Handy for writing to a file
 outFile = open(outName, 'w+')
