@@ -55,7 +55,7 @@ def dnMatrixCalculation(trajectory, structure, zmin, zmax, radius2, binSize, ref
         pos = sel.getCoords()[:,-1] # Grab selection position, z-coordinate
         ind = sel.getIndices() # Grab selection (atom) indices
         # Defines which INDEX of the pos/ind array goes into which bin.
-        inBin = np.argwhere((pos[:,np.newaxis] > binArray[np.newaxis,:-1]) & (pos[:,np.newaxis] < binArray[np.newaxis,1:])) 
+        inBin = np.argwhere((pos[:,np.newaxis] >= binArray[np.newaxis,:-1]) & (pos[:,np.newaxis] < binArray[np.newaxis,1:])) 
         horizontalStack = np.vstack((ind, inBin[:,1])).T # Combine atom index information with bin's index information
         oldHorizontalStack = np.vstack((oldInd, oldInBin[:,1])).T # Same as above, for previous frame (old) data
         # Mask the combined information array to leave only the ARRAY INDICES of the atomic indices + bin indices; (atom_index, bin_index)
