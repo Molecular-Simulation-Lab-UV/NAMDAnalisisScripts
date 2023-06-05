@@ -47,8 +47,9 @@ def dnMatrixCalculation(trajectory, structure, zmin, zmax, radius2, binSize, ref
     # Initializers for positions, indices and whether it's in bin or not at frame 0
     oldPos = structure.select(f'name OH2 and (x^2 + y^2) < {radius2} and z > {zmin} and z < {zmax}').getCoords()[:,-1]
     oldInd = structure.select(f'name OH2 and (x^2 + y^2) < {radius2} and z > {zmin} and z < {zmax}').getIndices()
-    oldInBin = np.argwhere((oldPos[:,np.newaxis] > binArray[np.newaxis,:-1]) & (oldPos[:,np.newaxis] < binArray[np.newaxis,1:]))
+    oldInBin = np.argwhere((oldPos[:,np.newaxis] >= binArray[np.newaxis,:-1]) & (oldPos[:,np.newaxis] < binArray[np.newaxis,1:]))
     for frame_n, frame in enumerate(trajectory, start = 1):
+        print(frame_n)
         prody.wrapAtoms(structure, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(structure.select(refName)))
         frame.superpose()
         sel = structure.select(f'name OH2 and (x^2 + y^2) < {radius2} and z > {zmin} and z < {zmax}')
