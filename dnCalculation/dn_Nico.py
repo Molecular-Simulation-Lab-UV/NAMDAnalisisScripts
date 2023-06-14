@@ -2,7 +2,7 @@
 #### IMPORTS ####
 #################
 
-from tqdm import tqdm
+from datetime import datetime
 import prody
 import numpy as np
 import argparse
@@ -68,6 +68,8 @@ print("largo del cilindro: ", lCyl)
 print("cantidad de bins: ", binNumber)
 print("tamaño de bins: ", binSize)
 
+t1 = datetime.now()
+
 traj = prody.Trajectory(dcdName[0])
 for d in dcdName[1:]:
     traj.addFile(d)
@@ -80,3 +82,8 @@ traj.link(pdb)
 
 dn = dn.dnMatrixCalculation(traj, pdb, loZ, upZ, rad2, binSize, refName)
 np.save(outName, dn)
+
+t2 = datetime.now()
+
+print('\nFIN')
+print('Time to completion was {0}'.format((t2.replace(microsecond=0) - t1.replace(microsecond=0))))
