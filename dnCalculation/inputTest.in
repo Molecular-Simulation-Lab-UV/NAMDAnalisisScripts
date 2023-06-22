@@ -1,0 +1,9 @@
+dcd	../TestFiles/eqf3_wrap.dcd
+pdb	../PermeationEvents/6.6.2.4.box.pdb
+ref	not water
+rad	4
+nbins	20
+upperZ	10
+lowerZ	-10
+sel	water
+out	testNico.out
