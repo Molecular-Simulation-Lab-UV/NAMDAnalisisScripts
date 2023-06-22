@@ -75,50 +75,22 @@ if len(dcdName) > 1:
 
 traj.link(pdb)
 traj.setCoords(pdb)
-
-if 'segname' in refName:
-    portion1 = refName.split('segname')
-    for i in range(len(portion1)-1):
-        refSeg = portion1[i+1].split()[0]
-        portion2 = portion1[i+1].split()
-        portion2.pop(0)
-        try:
-            portion2.remove('and')
-        except:
-            pass
-        portion3 = portion1[0].split() + portion2
-    traj.setAtoms(pdb[refSeg].select(' '.join(portion3)))
-else:
-    traj.setAtoms(pdb.select(refName))
+traj.setAtoms(pdb.select(refName))
 
 
 # Calculate Z distance between selections
 # This function returns the absolute value. You'll have to change the "return" at
 # the end of the following function in order to get the vector component.
 def calc1D(sel1, sel2):
-    if len(sel1) > 1:
-        selPos1 = prody.calcCenter(sel1)[2]
-    else:
-        selPos1 = sel1.getCoords()[0][2]
-    if len(sel2) > 1:
-        selPos2 = prody.calcCenter(sel2)[2]
-    else:
-        selPos2 = sel2.getCoords()[0][2]
+    selPos1 = prody.calcCenter(sel1)[2]
+    selPos2 = prody.calcCenter(sel2)[2]
     return abs(selPos1 - selPos2)
     
 # Calculate radial distance between selections
 def calc2D(sel1, sel2):
-    if len(sel1) > 1:
-        selPos1 = prody.calcCenter(sel1)[:2]
-    else:
-        selPos1 = sel1.getCoords()[0][:2]
-    if len(sel2) > 1:
-        selPos2 = prody.calcCenter(sel2)[:2]
-    else:
-        selPos2 = sel2.getCoords()[0][:2]
-    X = selPos1[0] - selPos2[0]
-    Y = selPos1[1] - selPos2[1]
-    return numpy.sqrt(X**2 + Y**2)
+    selPos1 = prody.calcCenter(sel1)[:2]
+    selPos2 = prody.calcCenter(sel2)[:2]
+    return numpy.linalg.norm(selPos1 - selPos2)
 
 # Set the first element as the one which all distance measurements will be
 # calculated against.
@@ -149,15 +121,9 @@ elif dim == 2:
             distArray[i,j] = calc2D(refSel, sel)
 elif dim == 3:
     for i, frame in enumerate(traj):
+        frame.superpose()
         for j, sel in enumerate(selections):
-            if len(sel) > 1 and len(refSel) > 1:
-                distArray[i,j] = prody.calcDistance(prody.calcCenter(refSel), prody.calcCenter(sel))
-            elif len(sel) == 1 and len(refSel) > 1:
-                distArray[i,j] = prody.calcDistance(prody.calcCenter(refSel), sel.getCoords())
-            elif len(sel) > 1 and len(refSel) == 1:
-                distArray[i,j] = prody.calcDistance(refSel.getCoords(), prody.calcCenter(sel))
-            else:
-                distArray[i,j] = prody.calcDistance(refSel.getCoords(), sel.getCoords())
+            distArray[i,j] = prody.calcDistance(prody.calcCenter(refSel), prody.calcCenter(sel))
 
 else:
     print('Something went wrong. Check dimension (-d) required (╯°□°)╯︵ ┻━┻')
