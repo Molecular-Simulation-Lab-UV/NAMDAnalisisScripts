@@ -1,2 +1,11 @@
 DistanceMeasurement/inputTest2.in
 TestFiles/*
+dnCalculation/outputRef.npy
+dnCalculation/pfMatrixRef.npy
+dnCalculation/pfTiming.dat
+dnCalculation/referenceOutput.npy
+dnCalculation/testNico.out.npy
+dnCalculation/testNico2.npy
+dnCalculation/timingProfile.dat
+dnCalculation/__pycache__/dnModule_Nico.cpython-37.pyc
+dnCalculation/__pycache__/dnModule.cpython-37.pyc
