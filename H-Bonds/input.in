@@ -1,0 +1,6 @@
+dcd	../TestFiles/eq5.longMD.first100.dcd
+psf	../TestFiles/FaPIP21.CHARMMGUI.HMR.psf
+group1	segid PROA and resid 95 to 107
+group2	segid PROA and resid 95 to 107
+ncpus	4
+out	test.out
