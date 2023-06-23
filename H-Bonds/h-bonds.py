@@ -12,6 +12,7 @@ import time
 
 parser = argparse.ArgumentParser(description = "Calculate the permeation events of selection's atoms through a pore.")
 parser.add_argument('-i', '--in_file', type = str, required = True, help = 'Path, either absolute or relative, to the input file')
+parser.add_argument('-p', '--procs', type = int, required = False, help = 'Number of cores for the analysis')
 
 arg = parser.parse_args()
 inFile = open(arg.in_file, 'r')
@@ -19,7 +20,10 @@ inFile = open(arg.in_file, 'r')
 dcdName = []
 outName = 'outFile.out'
 trajStep = None
-nCPUs = 1
+if arg.procs:
+    nCPUs = arg.procs
+else:
+    nCPUs = 1
 
 # Reading inputs from the input parameters file. This is for the analysis calculation,
 # NOT for the simulation itself.
@@ -62,8 +66,6 @@ for line in inFile:
     elif l[0].lower() == 'seq': # Should be a broader selection, not including the position bounds (without "and z <= XX") E.g., "name OH2" or "index 9000".
         if len(l[1:]) > 1:
             trajStep = int(l[1])
-    elif l[0].lower() == 'ncpus':
-        nCPUs = int(l[1])
     elif l[0].lower() == 'out': # Path to the output file, name included.
         outName = l[1]
 
