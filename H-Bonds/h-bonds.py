@@ -98,26 +98,11 @@ def CalcHBonds(queue, universe, sel1=None, sel2=None, groups=None, trajSlice=[No
 
     hbonds = HBA(universe=universe, between=groups, update_selections=False)
     # Modify the following to accept *args and avoid the consecutive if statements.
-    if sel1 is not None and sel2 is not None:
-        sel1_hydrogens = hbonds.guess_hydrogens(sel1)
-        sel1_acceptors = hbonds.guess_acceptors(sel1)
-        sel2_hydrogens = hbonds.guess_hydrogens(sel2)
-        sel2_acceptors = hbonds.guess_acceptors(sel2)
-        hbonds.hydrogens_sel = f"({sel1_hydrogens}) or ({sel2_hydrogens})"
-        hbonds.acceptors_sel = f"({sel1_acceptors}) or ({sel2_acceptors})"
+    sel_acceptors = hbonds.guess_acceptors(sel1)
+    sel_hydrogens = sel2
+    hbonds.hydrogens_sel = f"{sel_hydrogens}"
+    hbonds.acceptors_sel = f"{sel_acceptors}"
     
-    elif sel1 is not None:
-        sel1_hydrogens = hbonds.guess_hydrogens(sel1)
-        sel1_acceptors = hbonds.guess_acceptors(sel1)
-        hbonds.hydrogens_sel = f"({sel1_hydrogens})"
-        hbonds.acceptors_sel = f"({sel1_acceptors})"
-    
-    elif sel2 is not None:
-        sel2_hydrogens = hbonds.guess_hydrogens(sel2)
-        sel2_acceptors = hbonds.guess_acceptors(sel2)
-        hbonds.hydrogens_sel = f"({sel2_hydrogens})"
-        hbonds.acceptors_sel = f"({sel2_acceptors})"
-
     hbonds.run(start=trajSlice[0], stop=trajSlice[1], step=trajSlice[2], verbose=True)
 
     queue.put(hbonds.results.hbonds)
@@ -138,12 +123,12 @@ def main():
             trajSeq = [int(i*iterStep), len(u.trajectory), trajStep]
         else:
             trajSeq = [int(i*iterStep), int((i+1)*iterStep), trajStep]
-        process = mp.Process(target=CalcHBonds, args=(q, u, None, None, [group1, group2], trajSeq))
+        process = mp.Process(target=CalcHBonds, args=(q, u, sel1Name, sel2Name, [group1, group2], trajSeq))
         process.start()
     while q.qsize() < nCPUs:
         time.sleep(0.05)
     results = q.get()
-    while q.qsize() > 0:
+    while q.empty() is not True:
         numpy.vstack((results, q.get()))
     results = numpy.vstack(results).astype('str') # Handy for writing to a file
 
