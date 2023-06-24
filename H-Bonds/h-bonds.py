@@ -1,6 +1,4 @@
-from asyncio import as_completed
 import numpy
-import concurrent.futures as futures
 from datetime import datetime
 import MDAnalysis as mda
 from MDAnalysis.analysis.hydrogenbonds.hbond_analysis import \
