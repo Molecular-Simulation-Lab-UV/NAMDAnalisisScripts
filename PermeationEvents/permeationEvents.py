@@ -66,7 +66,7 @@ for line in inFile:
 
 pdb = prody.parsePDB(pdbName)
 traj = prody.Trajectory(dcdName[0])
-if len(traj) > 1:
+if len(dcdName) > 1:
     for d in dcdName[1:]:
         traj.addFile(d)
 
