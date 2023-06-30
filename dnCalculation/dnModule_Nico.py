@@ -19,7 +19,7 @@ volume_w = 18 / 6.02214e23
 #### FUNCTIONS ####
 ###################
 
-def dnMatrixCalculation(trajectory, structure, zmin, zmax, radius2, binSize, refName):
+def dnMatrixCalculation(trajectory, structure, selName, zmin, zmax, radius2, binSize, refName):
     """
     All-in-one binning + dn matrix calculation for each frame in a trajectory.
 
@@ -27,6 +27,8 @@ def dnMatrixCalculation(trajectory, structure, zmin, zmax, radius2, binSize, ref
     ----------
     trajectory : prody trajectory object
     structure : prody atomgroup object
+    selName: A selection of atoms to be tracked. In ion channels it's the ion of interest.
+        In AQPs, "name OH2" should do.
     zmin & zmax : z coordinates of the cylinder limits, asumming its center in (0, 0, 0)
     radius2 : square of the cylinder's radius
     binSize : size of the cylinder's bins, all equal, in [A] and along the length of the cylinder (z-direction)
@@ -45,13 +47,13 @@ def dnMatrixCalculation(trajectory, structure, zmin, zmax, radius2, binSize, ref
     prody.wrapAtoms(structure, unitcell = f0.getUnitcell()[:3], center = prody.calcCenter(structure.select(refName)))
     f0.superpose()
     # Initializers for positions, indices and whether it's in bin or not at frame 0
-    oldPos = structure.select(f'name OH2 and (x^2 + y^2) < {radius2} and z > {zmin} and z < {zmax}').getCoords()[:,-1]
-    oldInd = structure.select(f'name OH2 and (x^2 + y^2) < {radius2} and z > {zmin} and z < {zmax}').getIndices()
+    oldPos = structure.select(f'{selName} and (x^2 + y^2) < {radius2} and z > {zmin} and z < {zmax}').getCoords()[:,-1]
+    oldInd = structure.select(f'{selName} and (x^2 + y^2) < {radius2} and z > {zmin} and z < {zmax}').getIndices()
     oldInBin = np.argwhere((oldPos[:,np.newaxis] >= binArray[np.newaxis,:-1]) & (oldPos[:,np.newaxis] < binArray[np.newaxis,1:]))
     for frame_n, frame in enumerate(trajectory, start = 1):
         prody.wrapAtoms(structure, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(structure.select(refName)))
         frame.superpose()
-        sel = structure.select(f'name OH2 and (x^2 + y^2) < {radius2} and z > {zmin} and z < {zmax}')
+        sel = structure.select(f'{selName} and (x^2 + y^2) < {radius2} and z > {zmin} and z < {zmax}')
         pos = sel.getCoords()[:,-1] # Grab selection position, z-coordinate
         ind = sel.getIndices() # Grab selection (atom) indices
         # Defines which INDEX of the pos/ind array goes into which bin.

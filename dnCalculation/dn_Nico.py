@@ -64,6 +64,7 @@ binSize = lCyl/binNumber
 print("zmax: ", upZ)
 print("zmin: ", loZ)
 print("radio: ", rad)
+print("selección: ", selName)
 print("largo del cilindro: ", lCyl)
 print("cantidad de bins: ", binNumber)
 print("tamaño de bins: ", binSize)
@@ -80,7 +81,7 @@ traj.setAtoms(pdb.select(refName)) #Alineamos respecto al pdb de referencia usan
 traj.setCoords(pdb) #Establecemos el pdb como frame de referencia
 traj.link(pdb)
 
-dn = dn.dnMatrixCalculation(traj, pdb, loZ, upZ, rad2, binSize, refName)
+dn = dn.dnMatrixCalculation(traj, pdb, selName, loZ, upZ, rad2, binSize, refName)
 np.save(outName, dn)
 
 t2 = datetime.now()
