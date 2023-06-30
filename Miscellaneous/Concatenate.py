@@ -3,7 +3,6 @@ This is mainly for my own use and it was created because I'm lazy c:
 It's not warranted to work... at all. Use at your own risk.
 """
 
-
 import numpy
 import argparse
 from glob import glob
@@ -13,6 +12,7 @@ parser = argparse.ArgumentParser(description = "Concatenate two or more simple t
 parser.add_argument('-o', '--outfile', type = str, required = False, help = 'Output file path and name. Default is output.out.')
 parser.add_argument('-i', '--in_file', type = str, required = True, nargs = '+', help = 'List of files to join. Wildcards (*) can be used.')
 parser.add_argument('-c', '--columns', type = int, default = 0, nargs = '+', required = False, help = "Column indices to modify so they start from previous file's last step.\nDefault is only first (column 0).")
+parser.add_argument('-f', '--offset', type = int, required = False, nargs = '+', help = 'Offset of column values. Must be the same length as the number of columns in the file.')
 
 outName = 'output.out' # Default output file name
 
@@ -48,6 +48,7 @@ lastLine = dat[-1, columns]
 for file in files[1:]:
     dat  = numpy.loadtxt(file)
     dat[:, columns] = dat[:, columns] + lastLine
+    dat = dat + args.offset
     lastLine = dat[-1, columns]
     data.append(dat)
 
