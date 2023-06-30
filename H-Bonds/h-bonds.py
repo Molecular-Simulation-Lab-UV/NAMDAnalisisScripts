@@ -109,7 +109,7 @@ def CalcHBonds(queue, universe, sel1=None, sel2=None, groups=None, trajSlice=[No
 
 # Security check. Don't try to use more than the max amount of CPUs in the system.
 if nCPUs > mp.cpu_count():
-    nCPUs = mp.cpu_count()
+    nCPUs = 1
 
 def main():
     universes = []
