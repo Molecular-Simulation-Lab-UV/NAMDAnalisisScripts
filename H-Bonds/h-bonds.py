@@ -113,6 +113,7 @@ if nCPUs > mp.cpu_count():
 
 def main():
     universes = []
+    processes = []
     q = mp.Queue()
     for i in range(nCPUs):
         u = mda.Universe(psfName, dcdName)
@@ -123,12 +124,16 @@ def main():
         else:
             trajSeq = [int(i*iterStep), int((i+1)*iterStep), trajStep]
         process = mp.Process(target=CalcHBonds, args=(q, universes[i], sel1Name, sel2Name, [group1, group2], trajSeq))
+        processes.append(process)
         process.start()
     while q.qsize() < nCPUs:
         time.sleep(0.05)
     results = q.get()
     while q.empty() is not True:
         results = numpy.vstack((results, q.get()))
+        for p in processes:
+            p.join()
+            time.sleep(0.1)
     results = results.astype('str') # Handy for writing to a file
 
     outFile = open(outName, 'w+')
