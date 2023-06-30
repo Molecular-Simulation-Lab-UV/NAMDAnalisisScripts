@@ -103,7 +103,7 @@ def CalcHBonds(queue, universe, sel1=None, sel2=None, groups=None, trajSlice=[No
     
     hbonds.run(start=trajSlice[0], stop=trajSlice[1], step=trajSlice[2], verbose=True)
 
-    queue.put(hbonds.count_by_time())
+    queue.put(hbonds.results.hbonds)
 
 ################ ----------------- ################
 
@@ -112,23 +112,24 @@ if nCPUs > mp.cpu_count():
     nCPUs = mp.cpu_count()
 
 def main():
-
+    universes = []
     q = mp.Queue()
     for i in range(nCPUs):
         u = mda.Universe(psfName, dcdName)
+        universes.append(u)
         iterStep = len(u.trajectory)/nCPUs
         if nCPUs - i == 1:
             trajSeq = [int(i*iterStep), len(u.trajectory), trajStep]
         else:
             trajSeq = [int(i*iterStep), int((i+1)*iterStep), trajStep]
-        process = mp.Process(target=CalcHBonds, args=(q, u, sel1Name, sel2Name, [group1, group2], trajSeq))
+        process = mp.Process(target=CalcHBonds, args=(q, universes[i], sel1Name, sel2Name, [group1, group2], trajSeq))
         process.start()
     while q.qsize() < nCPUs:
         time.sleep(0.05)
     results = q.get()
     while q.empty() is not True:
-        numpy.vstack((results, q.get()))
-    results = numpy.vstack(results).astype('str') # Handy for writing to a file
+        results = numpy.vstack((results, q.get()))
+    results = results.astype('str') # Handy for writing to a file
 
     outFile = open(outName, 'w+')
     outFile.write('#Frame, Donor_index, Hydrogen_index, Acceptor_index, DA_distance, DHA_angle\n')
