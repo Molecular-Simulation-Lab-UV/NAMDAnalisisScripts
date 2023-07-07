@@ -97,13 +97,13 @@ def CalcHBonds(queue, universe, sel1=None, sel2=None, groups=None, trajSlice=[No
     hbonds = HBA(universe=universe, between=groups, update_selections=False)
     # Modify the following to accept *args and avoid the consecutive if statements.
     sel_acceptors = hbonds.guess_acceptors(sel1)
-    sel_hydrogens = sel2
+    sel_hydrogens = hbonds.guess_hydrogens(sel2)
     hbonds.hydrogens_sel = f"{sel_hydrogens}"
     hbonds.acceptors_sel = f"{sel_acceptors}"
     
     hbonds.run(start=trajSlice[0], stop=trajSlice[1], step=trajSlice[2], verbose=True)
 
-    queue.put(hbonds.results.hbonds)
+    queue.put(hbonds.count_by_time())
 
 ################ ----------------- ################
 
