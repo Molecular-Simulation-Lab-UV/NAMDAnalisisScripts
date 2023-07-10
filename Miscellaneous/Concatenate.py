@@ -14,6 +14,7 @@ parser.add_argument('-i', '--in_file', type = str, required = True, nargs = '+',
 parser.add_argument('-c', '--columns', type = int, default = 0, nargs = '+', required = False, help = "Column indices to modify so they start from previous file's last step.\nDefault is only first (column 0).")
 parser.add_argument('-f', '--offset', type = int, required = False, nargs = '+', help = 'Offset of column values. Must be the same length as the number of columns in the file.')
 
+
 outName = 'output.out' # Default output file name
 
 args = parser.parse_args()
