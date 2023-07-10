@@ -97,13 +97,13 @@ def CalcHBonds(queue, universe, sel1=None, sel2=None, groups=None, trajSlice=[No
     hbonds = HBA(universe=universe, between=groups, update_selections=False)
     # Modify the following to accept *args and avoid the consecutive if statements.
     sel_acceptors = hbonds.guess_acceptors(sel1)
-    sel_hydrogens = sel2
+    sel_hydrogens = hbonds.guess_hydrogens(sel2)
     hbonds.hydrogens_sel = f"{sel_hydrogens}"
     hbonds.acceptors_sel = f"{sel_acceptors}"
     
     hbonds.run(start=trajSlice[0], stop=trajSlice[1], step=trajSlice[2], verbose=True)
 
-    queue.put(hbonds.results.hbonds)
+    queue.put(hbonds.count_by_time())
 
 ################ ----------------- ################
 
@@ -112,23 +112,29 @@ if nCPUs > mp.cpu_count():
     nCPUs = mp.cpu_count()
 
 def main():
-
+    universes = []
+    processes = []
     q = mp.Queue()
     for i in range(nCPUs):
         u = mda.Universe(psfName, dcdName)
+        universes.append(u)
         iterStep = len(u.trajectory)/nCPUs
         if nCPUs - i == 1:
             trajSeq = [int(i*iterStep), len(u.trajectory), trajStep]
         else:
             trajSeq = [int(i*iterStep), int((i+1)*iterStep), trajStep]
-        process = mp.Process(target=CalcHBonds, args=(q, u, sel1Name, sel2Name, [group1, group2], trajSeq))
+        process = mp.Process(target=CalcHBonds, args=(q, universes[i], sel1Name, sel2Name, [group1, group2], trajSeq))
+        processes.append(process)
         process.start()
     while q.qsize() < nCPUs:
         time.sleep(0.05)
     results = q.get()
     while q.empty() is not True:
-        numpy.vstack((results, q.get()))
-    results = numpy.vstack(results).astype('str') # Handy for writing to a file
+        results = numpy.vstack((results, q.get()))
+        for p in processes:
+            p.join()
+            time.sleep(0.1)
+    results = results.astype('str') # Handy for writing to a file
 
     outFile = open(outName, 'w+')
     outFile.write('#Frame, Donor_index, Hydrogen_index, Acceptor_index, DA_distance, DHA_angle\n')

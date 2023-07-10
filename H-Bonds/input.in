@@ -4,5 +4,4 @@ sel1	segid PROA and resid 95 to 107
 sel2	(resname GLY and name HN) or (resname HSE and name HE2) or (resname SER and name HN) or (resname ILE and name HN)
 group1	segid PROA and resid 95 to 107
 group2	segid PROA and resid 95 to 107
-ncpus	4
-out	test.out
+out	test2.out
