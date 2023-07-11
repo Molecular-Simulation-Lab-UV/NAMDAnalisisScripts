@@ -141,8 +141,9 @@ elif arg.bins:
         inBin = numpy.argwhere((zPos[:,numpy.newaxis] >= binArray[numpy.newaxis, :-1]) & (zPos[:,numpy.newaxis] < binArray[numpy.newaxis, 1:]))
 
         binnedDipoles = numpy.zeros((len(binArray)-1, 3))
-        bins, binIndices, binCounts = numpy.unique(inBin[:,1], return_inverse = True, return_counts = True)
-        binCounts = numpy.pad(binCounts, (0, nBins-len(binCounts)), mode = 'constant', constant_values = 20)
+        _, binIndices, binCounts = numpy.unique(inBin[:,1], return_inverse = True, return_counts = True)
+        diffArray = numpy.flatnonzero(numpy.isin(numpy.arange(0, len(binArray)-1, 1), binIndices, invert = True))
+        binCounts = numpy.insert(binCounts, diffArray - numpy.arange(len(diffArray)), 1) # Number 1 doesn't matter, it could be any non-zero value
         numpy.add.at(binnedDipoles, binIndices, dipoles[inBin[:,0]])
         dipoleArray[f] = binnedDipoles/binCounts[:, numpy.newaxis]
 
