@@ -127,27 +127,25 @@ elif arg.bins:
     binArray = numpy.arange(zMin, zMax + binSize, binSize)
     sel = pdb.select(selName)
     charges = sel.getCharges()
-    coords = sel.getCoords()
     sliceIndices = numpy.cumsum(numpy.unique(sel.getResindices(), return_counts = True)[1])[:-1]
-    slices = numpy.split(coords, sliceIndices)
-    geoCenters = numpy.average(slices, axis = 1)
-    dipoles = numpy.sum((slices - geoCenters[:,numpy.newaxis,:])*numpy.reshape(charges, (int(len(charges)/sliceIndices[0]), sliceIndices[0], 1)), axis = 1)
-    dipoles = dipoles/numpy.linalg.norm(dipoles, axis = 1)[:,numpy.newaxis]
     for f, frame in enumerate(dcd):
         prody.wrapAtoms(pdb, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
         frame.superpose()
+        coords = pdb.select(selName).getCoords()
+        slices = numpy.split(coords, sliceIndices)
+        geoCenters = numpy.average(slices, axis = 1)
+        dipoles = numpy.sum((slices - geoCenters[:,numpy.newaxis,:])*numpy.reshape(charges, (int(len(charges)/sliceIndices[0]), sliceIndices[0], 1)), axis = 1)
+        dipoles = dipoles/numpy.linalg.norm(dipoles, axis = 1)[:,numpy.newaxis]
         flags = numpy.argwhere((numpy.sqrt(geoCenters[:,0]**2 + geoCenters[:,1]**2) < rad)) # Cylinder
         zPos = geoCenters[flags,-1]
         inBin = numpy.argwhere((zPos >= binArray[numpy.newaxis, :-1]) & (zPos < binArray[numpy.newaxis, 1:]))
 
         binnedDipoles = numpy.zeros((len(binArray)-1, 3))
-        bins, binIndices, binCounts = numpy.unique(inBin[:,1], return_inverse = True, return_counts = True)
-        binCounts = numpy.pad(binCounts, (0, nBins-len(binCounts)), mode = 'constant', constant_values = 20)
+        _, binIndices, binCounts = numpy.unique(inBin[:,1], return_inverse = True, return_counts = True)
+        diffArray = numpy.flatnonzero(numpy.isin(numpy.arange(0, len(binArray)-1, 1), binIndices, invert = True))
+        binCounts = numpy.insert(binCounts, diffArray - numpy.arange(len(diffArray)), 1) # Number 1 doesn't matter, it could be any non-zero value
         numpy.add.at(binnedDipoles, binIndices, dipoles[inBin[:,0]])
         dipoleArray[f] = binnedDipoles/binCounts[:, numpy.newaxis]
-        print(inBin)
-        if f == 4:
-            exit()
 
     if arg.average:
         dipoleAvg = numpy.average(dipoleArray, axis = 0)
