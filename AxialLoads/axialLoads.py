@@ -69,8 +69,6 @@ dcd.link(pdb)
 dcd.setCoords(pdb)
 dcd.setAtoms(pdb.select(refName))
 
-sel = pdb.select(selName)
-
 loadsArray = numpy.zeros((len(dcd), nBins))
 binSize = (zMax - zMin)/nBins
 binArray = numpy.arange(zMin, zMax + binSize, binSize)
@@ -78,15 +76,10 @@ binArray = numpy.arange(zMin, zMax + binSize, binSize)
 for f, frame in enumerate(dcd):
     prody.wrapAtoms(pdb, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
     frame.superpose()
-    coords = sel.getCoords()
+    coords = pdb.select(selName).getCoords()
     flags = numpy.argwhere((numpy.sqrt(coords[:,0]**2 + coords[:,1]**2) < rad) & (coords[:,2] < zMax) & (coords[:,2] > zMin))
     inBin = numpy.argwhere((coords[flags,2] >= binArray[numpy.newaxis, :-1]) & (coords[flags,2] < binArray[numpy.newaxis, 1:]))
     bins, binCounts = numpy.unique(inBin[:,1], return_counts = True)
-    # print(inBin)
-    # print(bins)
-    # print(binIndices)
-    # print(binCounts)
-    # exit()
     loadsArray[f,bins] = binCounts
 
 if arg.average:
@@ -96,7 +89,7 @@ if arg.average:
     outFile = open(outName, 'w+')
     outFile.write('# Z\t Loads avg\t Loads std\n')
     for ff, vals in enumerate(loadsAvg):
-        outFile.write('{0:2.2f} \t {1:2.3f} \t {2:2.3f} \n'.format(binCenters[ff], vals, loadsStd[ff]))
+        outFile.write('{0:2.2f} \t {1:2.5f} \t {2:2.5f} \n'.format(binCenters[ff], vals, loadsStd[ff]))
     
     outFile.close()
 else:
