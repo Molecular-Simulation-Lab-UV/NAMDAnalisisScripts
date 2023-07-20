@@ -86,7 +86,6 @@ dcd.link(pdb)
 dcd.setCoords(pdb)
 dcd.setAtoms(pdb.select(refName))
 
-t1 = datetime.now()
 # Calculate and return dipole
 
 if not arg.bins:
@@ -94,6 +93,8 @@ if not arg.bins:
     sel = atomSystem.select(selName)
     charges = sel.getCharges()
     dipoleArray = numpy.zeros(len(dcd))
+
+    t1 = datetime.now()
 
     for f, frame in enumerate(dcd):
         prody.wrapAtoms(pdb, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
@@ -125,6 +126,9 @@ elif arg.bins:
     binSize = L/nBins
     dipoleArray = numpy.zeros((len(dcd), nBins, 3)) # The 3 are the cartesian coordinates of the dipole moment vector
     binArray = numpy.arange(zMin, zMax + binSize, binSize)
+
+    t1 = datetime.now()
+
     for f, frame in enumerate(dcd):
         prody.wrapAtoms(pdb, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
         frame.superpose()
