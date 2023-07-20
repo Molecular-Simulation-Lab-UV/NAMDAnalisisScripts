@@ -82,14 +82,14 @@ if len(atoms) < 2:
     exit()
 
 
-dcd.link(pdb)
-dcd.setCoords(pdb)
-dcd.setAtoms(pdb.select(refName))
-
 # Calculate and return dipole
 
 if not arg.bins:
-    
+
+    dcd.link(pdb)
+    dcd.setCoords(pdb)
+    dcd.setAtoms(pdb.select(refName))
+
     sel = atomSystem.select(selName)
     charges = sel.getCharges()
     dipoleArray = numpy.zeros(len(dcd))
@@ -121,6 +121,10 @@ if not arg.bins:
         outFile.close()
 
 elif arg.bins:
+
+    dcd.link(pdb)
+    dcd.setCoords(pdb)
+    dcd.setAtoms(pdb.select(refName))
 
     L = zMax - zMin
     binSize = L/nBins
