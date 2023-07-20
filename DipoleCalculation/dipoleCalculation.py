@@ -81,20 +81,18 @@ if len(atoms) < 2:
     print('************************')
     exit()
 
+dcd.link(pdb)
+dcd.setCoords(pdb)
+dcd.setAtoms(pdb.select(refName))
 
+t1 = datetime.now()
 # Calculate and return dipole
 
 if not arg.bins:
-
-    dcd.link(pdb)
-    dcd.setCoords(pdb)
-    dcd.setAtoms(pdb.select(refName))
-
+    
     sel = atomSystem.select(selName)
     charges = sel.getCharges()
     dipoleArray = numpy.zeros(len(dcd))
-
-    t1 = datetime.now()
 
     for f, frame in enumerate(dcd):
         prody.wrapAtoms(pdb, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
@@ -122,16 +120,10 @@ if not arg.bins:
 
 elif arg.bins:
 
-    dcd.link(pdb)
-    dcd.setCoords(pdb)
-    dcd.setAtoms(pdb.select(refName))
-
     L = zMax - zMin
     binSize = L/nBins
     dipoleArray = numpy.zeros((len(dcd), nBins, 3)) # The 3 are the cartesian coordinates of the dipole moment vector
     binArray = numpy.arange(zMin, zMax + binSize, binSize)
-
-    t1 = datetime.now()
 
     for f, frame in enumerate(dcd):
         prody.wrapAtoms(pdb, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
