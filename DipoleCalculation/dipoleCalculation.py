@@ -81,12 +81,12 @@ if len(atoms) < 2:
     print('************************')
     exit()
 
-t1 = datetime.now()
 
 dcd.link(pdb)
 dcd.setCoords(pdb)
 dcd.setAtoms(pdb.select(refName))
 
+t1 = datetime.now()
 # Calculate and return dipole
 
 if not arg.bins:
