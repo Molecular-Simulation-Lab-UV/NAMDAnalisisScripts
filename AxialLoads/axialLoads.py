@@ -13,6 +13,7 @@ parser.add_argument('-a', '--average', action = 'store_true', required = False, 
 
 arg = parser.parse_args()
 inFile = open(arg.in_file, 'r')
+firstFrame = 0
 
 dcdName = []
 outName = 'outFile.out'
@@ -51,6 +52,8 @@ for line in inFile:
             nBins = int(l[1])
         elif l[0].lower() == 'rad':
             rad = float(l[1])
+        elif l[0].lower() == 'firstframe':
+            firstFrame = l[1]
     else:
         pass
 
@@ -73,7 +76,7 @@ binArray = numpy.arange(zMin, zMax + binSize, binSize)
 
 t1 = datetime.now()
 
-for f, frame in enumerate(dcd):
+for f, frame in enumerate(dcd, start = firstFrame):
     prody.wrapAtoms(pdb, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
     frame.superpose()
     coords = pdb.select(selName).getCoords()
