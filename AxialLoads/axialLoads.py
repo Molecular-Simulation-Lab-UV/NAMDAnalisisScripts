@@ -53,7 +53,7 @@ for line in inFile:
         elif l[0].lower() == 'rad':
             rad = float(l[1])
         elif l[0].lower() == 'ff':
-            firstFrame = l[1]
+            firstFrame = int(l[1])
     else:
         pass
 
