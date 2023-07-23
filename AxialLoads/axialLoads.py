@@ -52,7 +52,7 @@ for line in inFile:
             nBins = int(l[1])
         elif l[0].lower() == 'rad':
             rad = float(l[1])
-        elif l[0].lower() == 'firstframe':
+        elif l[0].lower() == 'ff':
             firstFrame = l[1]
     else:
         pass
