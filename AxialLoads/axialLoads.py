@@ -69,6 +69,7 @@ if len(dcdName) > 1: # Check for and add corresponding dcd files to the trajecto
 dcd.link(pdb)
 dcd.setCoords(pdb)
 dcd.setAtoms(pdb.select(refName))
+dcd.skip(firstFrame)
 
 loadsArray = numpy.zeros((len(dcd), nBins))
 binSize = (zMax - zMin)/nBins
@@ -76,11 +77,8 @@ binArray = numpy.arange(zMin, zMax + binSize, binSize)
 
 t1 = datetime.now()
 
-# Couldn't think of a better way to do this :S
-for i in range(firstFrame):
-    dcd.next()
 
-for f, frame in enumerate(dcd[firstFrame:]):
+for f, frame in enumerate(dcd):
     prody.wrapAtoms(pdb, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
     frame.superpose()
     coords = pdb.select(selName).getCoords()
