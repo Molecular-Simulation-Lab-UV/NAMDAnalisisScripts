@@ -76,6 +76,10 @@ binArray = numpy.arange(zMin, zMax + binSize, binSize)
 
 t1 = datetime.now()
 
+# Couldn't think of a better way to do this :S
+for i in range(firstFrame):
+    dcd.next()
+
 for f, frame in enumerate(dcd[firstFrame:]):
     prody.wrapAtoms(pdb, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
     frame.superpose()
