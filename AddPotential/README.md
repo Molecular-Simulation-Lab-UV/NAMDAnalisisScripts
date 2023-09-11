@@ -5,6 +5,6 @@ This simple script adds a linearly increasing/decreasing potential from the inpu
 Temperature is also required, in Kelvin.<br/>
 There is no input script, it's all on the command line. Usage (with mdanalysis):
 
-`python externalPotential.py -i raw_potential_file.dx -f external_field -t temperature -o path_to_output.dx`
+`python externalPotential.py -i raw_potential_file.dx -f external_field -t temperature -o path_to_output.dx` <br/>
 
 You can also use `python externalPotential.py -h` for help with the inputs.
