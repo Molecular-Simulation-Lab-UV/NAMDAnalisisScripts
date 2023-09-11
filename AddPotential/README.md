@@ -4,5 +4,7 @@
 This simple script adds a linearly increasing/decreasing potential from the input value to 0, from the z < 0 end to the z > 0 end of the simulation box. The potential value must be input in mV. <br/>
 Temperature is also required, in Kelvin.<br/>
 There is no input script, it's all on the command line. Usage (with mdanalysis):
+
 `python externalPotential.py -i raw_potential_file.dx -f external_field -t temperature -o path_to_output.dx`
+
 You can also use `python externalPotential.py -h` for help with the inputs.
