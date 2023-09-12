@@ -102,7 +102,7 @@ else:
     binCenters = ((binArray[:-1] + binArray[1:])/2).astype('str')
     outFile = open(outName, 'w+')
     outFile.write('# Frame \t {0}\n'.format(binCenters))
-    for ff, vals in loadsArray:
+    for ff, vals in enumerate(loadsArray):
         outFile.write('{0} \t {1} \n'.format(ff, '\t'.join(vals)))
     
     outFile.close()
