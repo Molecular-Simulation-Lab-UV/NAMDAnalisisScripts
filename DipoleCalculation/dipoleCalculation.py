@@ -149,12 +149,25 @@ elif arg.bins:
 
     if arg.average:
         dipoleAvg = numpy.average(dipoleArray, axis = 0)
+        dipoleAvg = dipoleAvg.astype('str')
         dipoleStd = numpy.std(dipoleArray, axis = 0)
+        dipoleStd = dipoleStd.astype('str')
         binCenters = (binArray[:-1] + binArray[1:])/2
+        binCenters = binCenters.astype('str')
         outFile = open(outName, 'w+')
         outFile.write('# Bin Center (z) \t Dipole average \t Dipole Std\n')
         for ff, vals in enumerate(dipoleAvg):
-            outFile.write('{0} \t {1} \t {2} \n'.format(binCenters[ff], vals, dipoleStd[ff]))
+            outFile.write('{0} \t {1} \t {2} \n'.format(binCenters[ff], '\t'.join(vals), '\t'.join(dipoleStd[ff])))
+        
+        outFile.close()
+    else:
+        dipoleArray = dipoleArray.astype('str')
+        binCenters = (binArray[:-1] + binArray[1:])/2
+        binCenters = binCenters.astype('str')
+        outFile = open(outName, 'w+')
+        outFile.write('# Frame \t | \t Dipole average per bin, with bin centers (z): \t {}\n'.format(binCenters))
+        for ff, vals in enumerate(dipoleArray):
+            outFile.write('{0} \t {1} \n'.format(ff, '\t'.join(numpy.concatenate(vals))))
         
         outFile.close()
 
