@@ -1,8 +1,7 @@
-
 import prody
-import numpy
 import argparse
 from datetime import datetime
+import numpy
 
 parser = argparse.ArgumentParser(description = 'Calculate the collective dipole of the given selection.')
 parser.add_argument('-i', '--in_file', type = str, required = True, help = 'Path, either absolute or relative, to the input file')
@@ -50,14 +49,16 @@ for line in inFile:
             elif l[0].lower() == 'zmax':
                 zMax = float(l[1])
             elif l[0].lower() == 'nbins':
-                spaceBins = int(l[1])
+                nBins = int(l[1])
             elif l[0].lower() == 'rad':
                 rad = float(l[1])
             elif l[0].lower() == 'thr':
-                timeBins = l[1:] # Can be a space-separated list. Each element is a number of minimum frames that define a "time-wise bin"
+                thr = l[1:] # Can be a space-separated list. Each element is a number of minimum frames that define a "time-wise bin"
                             # E.g. If 5, 100, 500 is given, data about residence time in intervals < 5 | 5 - 100 | 100 - 500 | 500 > will be returned.
+                            # The first interval is not considered. If set to 0, all actual intervals are considered.
         else:
             print("--bins (-b) flag was either not set or was set to False. Data won't be binned.")
+
     else:
         pass
 
@@ -74,4 +75,28 @@ dcd.setCoords(pdb)
 dcd.setAtoms(pdb.select(refName)) # refName = Selection used when aligning frames (frame.superpose())
 atomsSelection = pdb.select(selName)
 
-moleculeCharacterization = numpy.zeros((len(atomsSelection), len(timeBins), spaceBins))
+moleculesInBins = numpy.zeros((len(atomsSelection), nBins))
+lCyl = abs(zMax) + abs(zMin)
+binSize = lCyl/nBins
+binArray = numpy.arange(zMin, zMax + binSize, binSize)
+binsInTime = numpy.zeros_like((len(dcd)/thr), len(binArray))
+
+f0 = dcd.next()
+prody.wrapAtoms(pdb, unitcell = f0.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
+f0.superpose()
+# Initializers for positions, indices and whether it's in bin or not at frame 0
+oldPos = pdb.select(f'{selName} and (x^2 + y^2) < {rad**2} and z > {zMin} and z < {zMax}').getCoords()[:,-1]
+oldInd = pdb.select(f'{selName} and (x^2 + y^2) < {rad**2} and z > {zMin} and z < {zMax}').getIndices()
+oldInBin = numpy.argwhere((oldPos[:,numpy.newaxis] >= binArray[numpy.newaxis,:-1]) & (oldPos[:,numpy.newaxis] < binArray[numpy.newaxis,1:]))
+for f, frame in enumerate(dcd):
+        prody.wrapAtoms(pdb, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
+        frame.superpose()
+        sel = pdb.select(f'{selName} and (x^2 + y^2) < {rad**2} and z > {zMin} and z < {zMax}')
+        pos = sel.getCoords()[:,-1] # Grab selection position, z-coordinate
+        ind = sel.getIndices() # Grab selection (atom) indices
+        # Defines which INDEX of the pos/ind array goes into which bin.
+        inBin = numpy.argwhere((pos[:,numpy.newaxis] >= binArray[numpy.newaxis,:-1]) & (pos[:,numpy.newaxis] < binArray[numpy.newaxis,1:])) 
+        horizontalStack = numpy.vstack((ind, inBin[:,1])).T # Combine atom index information with bin's index information
+        oldHorizontalStack = numpy.vstack((oldInd, oldInBin[:,1])).T # Same as above, for previous frame (old) data
+        mask = numpy.flatnonzero((oldHorizontalStack == horizontalStack[:,None]).all(-1).any(-1))
+        moleculesInBins[mask] += 1
