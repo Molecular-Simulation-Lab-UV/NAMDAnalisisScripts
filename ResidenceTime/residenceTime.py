@@ -29,8 +29,6 @@ for line in inFile:
             dcdName.append(l[1])
         elif l[0] == 'pdb':
             pdbName = l[1]
-        elif l[0] == 'psf':
-            psfName = l[1]
         elif l[0] == 'ref': # Alignment selection
             if len(l[1:]) > 1:
                 refName = ' '.join(l[1:])
@@ -53,7 +51,7 @@ for line in inFile:
             elif l[0].lower() == 'rad':
                 rad = float(l[1])
             elif l[0].lower() == 'thr':
-                thr = l[1:] # Can be a space-separated list. Each element is a number of minimum frames that define a "time-wise bin"
+                thr = int(l[1]) # Can be a space-separated list. Each element is a number of minimum frames that define a "time-wise bin"
                             # E.g. If 5, 100, 500 is given, data about residence time in intervals < 5 | 5 - 100 | 100 - 500 | 500 > will be returned.
                             # The first interval is not considered. If set to 0, all actual intervals are considered.
         else:
@@ -75,19 +73,26 @@ dcd.setCoords(pdb)
 dcd.setAtoms(pdb.select(refName)) # refName = Selection used when aligning frames (frame.superpose())
 atomsSelection = pdb.select(selName)
 
-moleculesInBins = numpy.zeros((len(atomsSelection), nBins))
+# The number of frames that a molecule has stayed in one same bin
 lCyl = abs(zMax) + abs(zMin)
 binSize = lCyl/nBins
 binArray = numpy.arange(zMin, zMax + binSize, binSize)
-binsInTime = numpy.zeros_like((len(dcd)/thr), len(binArray))
 
+t1 = datetime.now()
+
+moleculesInBins = numpy.zeros((len(atomsSelection), nBins+1)).astype(int)
+moleculesInBins[:,0] = atomsSelection.getIndices()
+oldMoleculesInBins = moleculesInBins.copy()
+# moleculesInBins = pd.DataFrame(data = 0, index = atomsSelection.getIndices(), columns = numpy.arange(0, len(binArray)-1, 1))
+# The value for each bin throughout the simulation.
+binsInTime = numpy.zeros((len(dcd), len(atomsSelection), nBins))
 f0 = dcd.next()
 prody.wrapAtoms(pdb, unitcell = f0.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
 f0.superpose()
-# Initializers for positions, indices and whether it's in bin or not at frame 0
 oldPos = pdb.select(f'{selName} and (x^2 + y^2) < {rad**2} and z > {zMin} and z < {zMax}').getCoords()[:,-1]
 oldInd = pdb.select(f'{selName} and (x^2 + y^2) < {rad**2} and z > {zMin} and z < {zMax}').getIndices()
 oldInBin = numpy.argwhere((oldPos[:,numpy.newaxis] >= binArray[numpy.newaxis,:-1]) & (oldPos[:,numpy.newaxis] < binArray[numpy.newaxis,1:]))
+# Initializers for positions, indices and whether it's in bin or not at frame 0
 for f, frame in enumerate(dcd):
         prody.wrapAtoms(pdb, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
         frame.superpose()
@@ -95,8 +100,34 @@ for f, frame in enumerate(dcd):
         pos = sel.getCoords()[:,-1] # Grab selection position, z-coordinate
         ind = sel.getIndices() # Grab selection (atom) indices
         # Defines which INDEX of the pos/ind array goes into which bin.
-        inBin = numpy.argwhere((pos[:,numpy.newaxis] >= binArray[numpy.newaxis,:-1]) & (pos[:,numpy.newaxis] < binArray[numpy.newaxis,1:])) 
-        horizontalStack = numpy.vstack((ind, inBin[:,1])).T # Combine atom index information with bin's index information
-        oldHorizontalStack = numpy.vstack((oldInd, oldInBin[:,1])).T # Same as above, for previous frame (old) data
+        inBin = numpy.argwhere((pos[:,numpy.newaxis] >= binArray[numpy.newaxis,:-1]) & (pos[:,numpy.newaxis] < binArray[numpy.newaxis,1:]))
+        horizontalStack = numpy.vstack((ind, inBin[:,1] + 1)).T
+        oldHorizontalStack = numpy.vstack((oldInd, oldInBin[:,1] + 1)).T
         mask = numpy.flatnonzero((oldHorizontalStack == horizontalStack[:,None]).all(-1).any(-1))
-        moleculesInBins[mask] += 1
+        # oldMask = numpy.flatnonzero((horizontalStack == oldHorizontalStack[:,None]).all(-1).any(-1))
+        moleculesMask = numpy.isin(moleculesInBins[:,0], ind[mask])
+        moleculesInBins[moleculesMask, inBin[mask,1]+1] += 1
+        validTimes = numpy.where((moleculesInBins[numpy.invert(moleculesMask), 1:] > thr), moleculesInBins[numpy.invert(moleculesMask), 1:], 0)
+        binsInTime[f, numpy.invert(moleculesMask)] = validTimes
+        # print(moleculesInBins[moleculesInBins[:, 4] != 0])
+        moleculesInBins[numpy.invert(moleculesMask), 1:] = 0
+        oldPos = pos
+        oldInd = ind
+        oldInBin = inBin
+
+totalFrames = numpy.sum(binsInTime, axis = (0, 1))
+nonZeroFrames = numpy.count_nonzero(binsInTime, axis = (0, 1))
+finalArray = numpy.where(nonZeroFrames != 0, totalFrames / nonZeroFrames, 0)
+print(finalArray)
+outFile = open(outName, 'w+')
+outFile.write('# Z |\t Residence time avg \n')
+
+for vals in finalArray:
+    outFile.write('{0} \n'.format(vals))
+    
+outFile.close()
+
+t2 = datetime.now()
+
+print('\nFIN')
+print('Time to completion was {0}'.format((t2.replace(microsecond=0) - t1.replace(microsecond=0))))

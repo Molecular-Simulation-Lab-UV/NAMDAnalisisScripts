@@ -1,0 +1,10 @@
+dcd1      ../TestFiles/eqf3_wrap.dcd 
+rad       4
+pdb       ../TestFiles/6.6.2.4.box.pdb
+zmax	  10
+zmin      -10
+nbins	  10
+thr       5
+ref       resname CNT
+sel       name OH2
+out       testOut.out
