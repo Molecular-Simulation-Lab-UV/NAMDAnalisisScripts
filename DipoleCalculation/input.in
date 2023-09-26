@@ -1,10 +1,10 @@
-dcd	../TestFiles/eq5.longMD.first100.dcd
-psf	../TestFiles/FaPIP21.CHARMMGUI.HMR.psf
-pdb	../TestFiles/FaPIP21.CHARMMGUI.HMR.pdb
-ref	segment PROA and backbone
+dcd	/mnt/c/CINV-Research/Colaboraciones_Aportes/A.Caviglia/FaPIP-Mecano/Results/Rep1/Tension/eq5.first100.dcd
+psf	/mnt/c/CINV-Research/Colaboraciones_Aportes/A.Caviglia/FaPIP-Mecano/Results/FaPIP21.POPC.Wat.box.ion.psf
+pdb	/mnt/c/CINV-Research/Colaboraciones_Aportes/A.Caviglia/FaPIP-Mecano/Results/Rep1/A.NPAcentered.pdb
+ref	chain A and backbone
 sel	water
-zmin	-30
-zmax	-20
-rad	4
-nbins	5
+zmin	-25
+zmax	25
+rad	5
+nbins	25
 out	test3.out

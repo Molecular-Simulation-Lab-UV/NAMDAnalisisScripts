@@ -141,12 +141,12 @@ elif arg.bins:
         inBin = numpy.argwhere((zPos[:,numpy.newaxis] >= binArray[numpy.newaxis, :-1]) & (zPos[:,numpy.newaxis] < binArray[numpy.newaxis, 1:]))
 
         binnedDipoles = numpy.zeros((len(binArray)-1, 3))
-        _, binIndices, binCounts = numpy.unique(inBin[:,1], return_inverse = True, return_counts = True)
-        diffArray = numpy.flatnonzero(numpy.isin(numpy.arange(0, len(binArray)-1, 1), binIndices, invert = True))
+        binUniques, binCounts = numpy.unique(inBin[:,1], return_counts = True)
+        diffArray = numpy.flatnonzero(numpy.isin(numpy.arange(0, len(binArray)-1, 1), binUniques, invert = True))
         binCounts = numpy.insert(binCounts, diffArray - numpy.arange(len(diffArray)), 1) # Number 1 doesn't matter, it could be any non-zero value
-        numpy.add.at(binnedDipoles, binIndices, dipoles[inBin[:,0]])
+        numpy.add.at(binnedDipoles, inBin[:,1], dipoles[inBin[:,0]])
         dipoleArray[f] = binnedDipoles/binCounts[:, numpy.newaxis]
-
+        
     if arg.average:
         dipoleAvg = numpy.average(dipoleArray, axis = 0)
         dipoleAvg = dipoleAvg.astype('str')
