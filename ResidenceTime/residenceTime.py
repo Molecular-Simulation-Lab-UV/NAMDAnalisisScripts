@@ -111,11 +111,12 @@ for f, frame in enumerate(dcd):
         mask = numpy.flatnonzero((oldHorizontalStack == horizontalStack[:,None]).all(-1).any(-1))
         # oldMask = numpy.flatnonzero((horizontalStack == oldHorizontalStack[:,None]).all(-1).any(-1))
         moleculesMask = numpy.isin(moleculesInBins[:,0], ind[mask])
+        notMoleculesMask = numpy.invert(moleculesMask)
         moleculesInBins[moleculesMask, inBin[mask,1]+1] += 1
-        validTimes = numpy.where((moleculesInBins[numpy.invert(moleculesMask), 1:] > thr), moleculesInBins[numpy.invert(moleculesMask), 1:], 0)
-        binsInTime[f, numpy.invert(moleculesMask)] = validTimes
+        validTimes = numpy.where((moleculesInBins[notMoleculesMask, 1:] > thr), moleculesInBins[notMoleculesMask, 1:], 0)
+        binsInTime[f, notMoleculesMask] = validTimes
         # print(moleculesInBins[moleculesInBins[:, 4] != 0])
-        moleculesInBins[numpy.invert(moleculesMask), 1:] = 0
+        moleculesInBins[notMoleculesMask, 1:] = 0
         oldPos = pos
         oldInd = ind
         oldInBin = inBin
@@ -123,12 +124,11 @@ for f, frame in enumerate(dcd):
 totalFrames = numpy.sum(binsInTime, axis = (0, 1))
 nonZeroFrames = numpy.count_nonzero(binsInTime, axis = (0, 1))
 finalArray = numpy.where(nonZeroFrames != 0, totalFrames / nonZeroFrames, 0)
-print(finalArray)
 outFile = open(outName, 'w+')
 outFile.write('# Z |\t Residence time avg \n')
 
-for vals in finalArray:
-    outFile.write('{0} \n'.format(vals))
+for f, vals in enumerate(finalArray):
+    outFile.write('{0} \t {1} \n'.format(binArray[f+1] - binSize/2, vals))
     
 outFile.close()
 
