@@ -90,7 +90,7 @@ moleculesInBins = numpy.zeros((len(atomsSelection), nBins+1)).astype(int)
 moleculesInBins[:,0] = atomsSelection.getIndices()
 oldMoleculesInBins = moleculesInBins.copy()
 # The value for each bin throughout the simulation.
-binsInTime = numpy.zeros((len(dcd), len(atomsSelection), nBins))
+binsInTime = numpy.zeros((len(dcd), nBins))
 f0 = dcd.next()
 prody.wrapAtoms(pdb, unitcell = f0.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
 f0.superpose()
@@ -113,16 +113,16 @@ for f, frame in enumerate(dcd):
         moleculesMask = numpy.isin(moleculesInBins[:,0], ind[mask])
         notMoleculesMask = numpy.invert(moleculesMask)
         moleculesInBins[moleculesMask, inBin[mask,1]+1] += 1
-        validTimes = numpy.where((moleculesInBins[notMoleculesMask, 1:] > thr), moleculesInBins[notMoleculesMask, 1:], 0)
-        binsInTime[f, notMoleculesMask] = validTimes
-        # print(moleculesInBins[moleculesInBins[:, 4] != 0])
+        validTimes = numpy.where((moleculesInBins[notMoleculesMask, 1:] > thr), moleculesInBins[notMoleculesMask, 1:], 0).astype(float)
+        nonZeroBins = numpy.count_nonzero(validTimes, axis=0)
+        binsInTime[f] = numpy.where(nonZeroBins != 0, validTimes.sum(axis=0)/nonZeroBins, 0)
         moleculesInBins[notMoleculesMask, 1:] = 0
         oldPos = pos
         oldInd = ind
         oldInBin = inBin
 
-totalFrames = numpy.sum(binsInTime, axis = (0, 1))
-nonZeroFrames = numpy.count_nonzero(binsInTime, axis = (0, 1))
+totalFrames = numpy.sum(binsInTime, axis = 0)
+nonZeroFrames = numpy.count_nonzero(binsInTime, axis = 0)
 finalArray = numpy.where(nonZeroFrames != 0, totalFrames / nonZeroFrames, 0)
 outFile = open(outName, 'w+')
 outFile.write('# Z |\t Residence time avg \n')
