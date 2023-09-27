@@ -1,9 +1,3 @@
-"""
-TODO:   - Remove the -bins option, it makes no sense to not have it by default with a minimum of 1, spanning the cylinder.
-        - Add the capacity for average output: The -a flag is supported, but the script doesn't integrate it.
-"""
-
-
 import prody
 import argparse
 from datetime import datetime
@@ -11,17 +5,12 @@ import numpy
 
 parser = argparse.ArgumentParser(description = 'Calculate the collective dipole of the given selection.')
 parser.add_argument('-i', '--in_file', type = str, required = True, help = 'Path, either absolute or relative, to the input file')
-parser.add_argument('-a', '--average', action = 'store_true', required = False, default = False, help = 'Calculate the average for the trajectory if included (with "-a" option), frame-by-frame-wise if not included. Default: False')
-parser.add_argument('-b', '--bins', action = 'store_true', required = False, default = False, help = 'Return dipole of selection "sel" binned across a cylinder. Default: False')
 
 arg = parser.parse_args()
 inFile = open(arg.in_file, 'r')
 
 dcdName = []
 outName = 'outFile.out'
-
-avg = arg.average
-
 
 # Reading inputs from the input parameters file. This is for the analysis calculation,
 # NOT for the simulation itself.
@@ -106,21 +95,29 @@ for f, frame in enumerate(dcd):
         ind = sel.getIndices() # Grab selection (atom) indices
         # Defines which INDEX of the pos/ind array goes into which bin.
         inBin = numpy.argwhere((pos[:,numpy.newaxis] >= binArray[numpy.newaxis,:-1]) & (pos[:,numpy.newaxis] < binArray[numpy.newaxis,1:]))
+        # Combine the index of an atom in the selection with the respective bin.
         horizontalStack = numpy.vstack((ind, inBin[:,1] + 1)).T
         oldHorizontalStack = numpy.vstack((oldInd, oldInBin[:,1] + 1)).T
+        # Compare which pair index/bin persists after the previous frame
         mask = numpy.flatnonzero((oldHorizontalStack == horizontalStack[:,None]).all(-1).any(-1))
-        # oldMask = numpy.flatnonzero((horizontalStack == oldHorizontalStack[:,None]).all(-1).any(-1))
+        # Check which of the global selection atoms have remained in their bin (moleculesMask) and which haven't (notMoleculesMaks)
         moleculesMask = numpy.isin(moleculesInBins[:,0], ind[mask])
         notMoleculesMask = numpy.invert(moleculesMask)
+        # Add +1 to the counter for those atoms that persist
         moleculesInBins[moleculesMask, inBin[mask,1]+1] += 1
+        # Select those atoms that 1. Haven't remained in their bin and 2. Are higher than the threshold established.
         validTimes = numpy.where((moleculesInBins[notMoleculesMask, 1:] > thr), moleculesInBins[notMoleculesMask, 1:], 0).astype(float)
         nonZeroBins = numpy.count_nonzero(validTimes, axis=0)
+        # Add the average counter, of all atoms, per bin for the current frame
         binsInTime[f] = numpy.where(nonZeroBins != 0, validTimes.sum(axis=0)/nonZeroBins, 0)
+        # Reset the counter for those that don't persist
         moleculesInBins[notMoleculesMask, 1:] = 0
+        # Update values
         oldPos = pos
         oldInd = ind
         oldInBin = inBin
 
+# Get the average in the time axis and output
 totalFrames = numpy.sum(binsInTime, axis = 0)
 nonZeroFrames = numpy.count_nonzero(binsInTime, axis = 0)
 finalArray = numpy.where(nonZeroFrames != 0, totalFrames / nonZeroFrames, 0)
