@@ -1,3 +1,9 @@
+"""
+TODO:   - Remove the -bins option, it makes no sense to not have it by default with a minimum of 1, spanning the cylinder.
+        - Add the capacity for average output: The -a flag is supported, but the script doesn't integrate it.
+"""
+
+
 import prody
 import argparse
 from datetime import datetime
@@ -83,7 +89,6 @@ t1 = datetime.now()
 moleculesInBins = numpy.zeros((len(atomsSelection), nBins+1)).astype(int)
 moleculesInBins[:,0] = atomsSelection.getIndices()
 oldMoleculesInBins = moleculesInBins.copy()
-# moleculesInBins = pd.DataFrame(data = 0, index = atomsSelection.getIndices(), columns = numpy.arange(0, len(binArray)-1, 1))
 # The value for each bin throughout the simulation.
 binsInTime = numpy.zeros((len(dcd), len(atomsSelection), nBins))
 f0 = dcd.next()
