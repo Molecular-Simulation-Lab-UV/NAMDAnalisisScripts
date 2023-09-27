@@ -10,6 +10,7 @@ import numpy
 import time
 import argparse
 import MDAnalysis
+import MDAnalysis.transformations as trans
 import MDAnalysis.analysis.hole2 as hole2
 
 # Print time in hours, mins, secs
@@ -37,10 +38,13 @@ parser.add_argument('-p', '--hole_path', type = str, required = False, help = 'P
 
 arg = parser.parse_args()
 inFile = open(arg.in_file, 'r')
+
+dcdName = []
+
 for line in inFile:
 	l = line.strip().split()
 	if l[0] == 'dcd':
-		dcdName = l[1]
+		dcdName.append(l[1])
 	elif l[0] == 'psf':
 		psfName = l[1]
 	elif dcdName != None and psfName != None and l[0] == 'sel':
@@ -61,10 +65,17 @@ print('\nInitiating HOLE calculation over the given trajectory.\n ... \n')
 t1 = time.perf_counter()
 
 uni = MDAnalysis.Universe(psfName, dcdName)
+
+# Centers the selection
 if 'selName' in locals() and len(selName) >= 1:
+	centering = trans.center_in_box(uni.select_atoms(selName))
+	uni.trajectory.add_transformations(centering)
 	traj = hole2.HoleAnalysis(uni, select = selName, executable = holePath)
 
+# Centers the "protein" selection as generic. It might be worth trying with "all" instead.
 else:
+	centering = trans.center_in_box(uni.select_atoms('protein'))
+	uni.trajectory.add_transformations(centering)
 	traj = hole2.HoleAnalysis(uni, executable = holePath)
 
 traj.run(random_seed = 1000)

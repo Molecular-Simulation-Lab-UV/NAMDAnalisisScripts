@@ -81,12 +81,11 @@ if len(atoms) < 2:
     print('************************')
     exit()
 
-t1 = datetime.now()
-
 dcd.link(pdb)
 dcd.setCoords(pdb)
 dcd.setAtoms(pdb.select(refName))
 
+t1 = datetime.now()
 # Calculate and return dipole
 
 if not arg.bins:
@@ -125,13 +124,14 @@ elif arg.bins:
     binSize = L/nBins
     dipoleArray = numpy.zeros((len(dcd), nBins, 3)) # The 3 are the cartesian coordinates of the dipole moment vector
     binArray = numpy.arange(zMin, zMax + binSize, binSize)
-    sel = pdb.select(selName)
-    charges = sel.getCharges()
-    sliceIndices = numpy.cumsum(numpy.unique(sel.getResindices(), return_counts = True)[1])[:-1]
+
     for f, frame in enumerate(dcd):
         prody.wrapAtoms(pdb, unitcell = frame.getUnitcell()[:3], center = prody.calcCenter(pdb.select(refName)))
         frame.superpose()
-        coords = pdb.select(selName).getCoords()
+        sel = pdb.select(f'same residue as ({selName} and (x^2 + y^2) < {rad**2} and z < {zMax} and z > {zMin})')
+        charges = sel.getCharges()
+        coords = sel.getCoords()
+        sliceIndices = numpy.cumsum(numpy.unique(sel.getResindices(), return_counts = True)[1])[:-1]
         slices = numpy.split(coords, sliceIndices)
         geoCenters = numpy.average(slices, axis = 1)
         dipoles = numpy.sum((slices - geoCenters[:,numpy.newaxis,:])*numpy.reshape(charges, (int(len(charges)/sliceIndices[0]), sliceIndices[0], 1)), axis = 1)
@@ -141,20 +141,33 @@ elif arg.bins:
         inBin = numpy.argwhere((zPos >= binArray[numpy.newaxis, :-1]) & (zPos < binArray[numpy.newaxis, 1:]))
 
         binnedDipoles = numpy.zeros((len(binArray)-1, 3))
-        _, binIndices, binCounts = numpy.unique(inBin[:,1], return_inverse = True, return_counts = True)
-        diffArray = numpy.flatnonzero(numpy.isin(numpy.arange(0, len(binArray)-1, 1), binIndices, invert = True))
+        binUniques, binCounts = numpy.unique(inBin[:,1], return_counts = True)
+        diffArray = numpy.flatnonzero(numpy.isin(numpy.arange(0, len(binArray)-1, 1), binUniques, invert = True))
         binCounts = numpy.insert(binCounts, diffArray - numpy.arange(len(diffArray)), 1) # Number 1 doesn't matter, it could be any non-zero value
-        numpy.add.at(binnedDipoles, binIndices, dipoles[inBin[:,0]])
+        numpy.add.at(binnedDipoles, inBin[:,1], dipoles[inBin[:,0]])
         dipoleArray[f] = binnedDipoles/binCounts[:, numpy.newaxis]
-
+        
     if arg.average:
         dipoleAvg = numpy.average(dipoleArray, axis = 0)
+        dipoleAvg = dipoleAvg.astype('str')
         dipoleStd = numpy.std(dipoleArray, axis = 0)
+        dipoleStd = dipoleStd.astype('str')
         binCenters = (binArray[:-1] + binArray[1:])/2
+        binCenters = binCenters.astype('str')
         outFile = open(outName, 'w+')
         outFile.write('# Bin Center (z) \t Dipole average \t Dipole Std\n')
         for ff, vals in enumerate(dipoleAvg):
-            outFile.write('{0} \t {1} \t {2} \n'.format(binCenters[ff], vals, dipoleStd[ff]))
+            outFile.write('{0} \t {1} \t {2} \n'.format(binCenters[ff], '\t'.join(vals), '\t'.join(dipoleStd[ff])))
+        
+        outFile.close()
+    else:
+        dipoleArray = dipoleArray.astype('str')
+        binCenters = (binArray[:-1] + binArray[1:])/2
+        binCenters = binCenters.astype('str')
+        outFile = open(outName, 'w+')
+        outFile.write('# Frame \t | \t Dipole average per bin, with bin centers (z): \t {}\n'.format(binCenters))
+        for ff, vals in enumerate(dipoleArray):
+            outFile.write('{0} \t {1} \n'.format(ff, '\t'.join(numpy.concatenate(vals))))
         
         outFile.close()
 

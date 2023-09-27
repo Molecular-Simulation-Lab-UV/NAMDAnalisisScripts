@@ -8,8 +8,8 @@ import gridData, argparse, numpy
 parser = argparse.ArgumentParser(description = "Add the effect of an external potential to the .dx file")
 parser.add_argument('-i', '--in_file', type = str, required = True, help = '[String] Path, either absolute or relative, to the dx file')
 parser.add_argument('-f', '--field', type = float, required = True, help = '[Float] Value, in mV, of the external potential. E.g: -100')
-parser.add_argument('-t', '--temp', type = float, required = False, help = '[Float] Temperature, in Kelvin, at which the simulation is run. Used to calculate potential in k_BT/e. Default = 300')
-parser.add_argument('-o', '--out', type = str, required = False, help = '[String] Output path of the resulting modified DX file. ./outputDX.dx by default')
+parser.add_argument('-t', '--temp', type = float, required = False, default = 300, help = '[Float] Temperature, in Kelvin, at which the simulation is run. Used to calculate potential in k_BT/e. Default = 300')
+parser.add_argument('-o', '--out', type = str, required = False, default = 'outputDX.dx', help = '[String] Output path of the resulting modified DX file. ./outputDX.dx by default')
 
 arg = parser.parse_args()
 dx = gridData.Grid(arg.in_file)
@@ -30,10 +30,6 @@ else:
     print('Nothing to do here')
     exit()
 
-dxOut = gridData.Grid(finalDX, edges=dx.edges, origin=dx.origin, delta=dx.delta)
-
-if arg.out != None:
-    dxOut.export(arg.out)
-else:
-    dxOut.export('outputDX.dx')
 # Make new grid and write data out
+dxOut = gridData.Grid(finalDX, edges=dx.edges, origin=dx.origin, delta=dx.delta)
+dxOut.export(arg.out)

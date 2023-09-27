@@ -103,7 +103,7 @@ def CalcHBonds(queue, universe, sel1=None, sel2=None, groups=None, trajSlice=[No
     
     hbonds.run(start=trajSlice[0], stop=trajSlice[1], step=trajSlice[2], verbose=True)
 
-    queue.put(hbonds.count_by_time())
+    queue.put(hbonds.results.hbonds)
 
 ################ ----------------- ################
 
