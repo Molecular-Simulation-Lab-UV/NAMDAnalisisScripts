@@ -36,22 +36,18 @@ for line in inFile:
                 selName = l[1]
         elif l[0] == 'out':
             outName = l[1]
-        if arg.bins == True:
-            if l[0].lower() == 'zmin':
-                zMin = float(l[1])
-            elif l[0].lower() == 'zmax':
-                zMax = float(l[1])
-            elif l[0].lower() == 'nbins':
-                nBins = int(l[1])
-            elif l[0].lower() == 'rad':
-                rad = float(l[1])
-            elif l[0].lower() == 'thr':
-                thr = int(l[1]) # Can be a space-separated list. Each element is a number of minimum frames that define a "time-wise bin"
+        if l[0].lower() == 'zmin':
+            zMin = float(l[1])
+        elif l[0].lower() == 'zmax':
+            zMax = float(l[1])
+        elif l[0].lower() == 'nbins':
+            nBins = int(l[1])
+        elif l[0].lower() == 'rad':
+            rad = float(l[1])
+        elif l[0].lower() == 'thr':
+            thr = int(l[1]) # Can be a space-separated list. Each element is a number of minimum frames that define a "time-wise bin"
                             # E.g. If 5, 100, 500 is given, data about residence time in intervals < 5 | 5 - 100 | 100 - 500 | 500 > will be returned.
                             # The first interval is not considered. If set to 0, all actual intervals are considered.
-        else:
-            print("--bins (-b) flag was either not set or was set to False. Data won't be binned.")
-
     else:
         pass
 
