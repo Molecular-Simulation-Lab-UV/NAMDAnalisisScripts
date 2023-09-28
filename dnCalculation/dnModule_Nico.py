@@ -64,7 +64,7 @@ def dnMatrixCalculation(trajectory, structure, selName, zmin, zmax, radius2, bin
         # For example, if only atom index 1000 is in the same bin as it was in the previous frame, mask will be (1000, index_of_bin)
         mask = np.flatnonzero((oldHorizontalStack == horizontalStack[:,None]).all(-1).any(-1))
         oldMask = np.flatnonzero((horizontalStack == oldHorizontalStack[:,None]).all(-1).any(-1)) # Same, but for the previous (old) frame
-        dnMatrix[frame_n, inBin[mask,1]] = pos[mask] - oldPos[oldMask] # Now we use the masks to go find the positions of the same atom, that is in the same bin, in two consecutive frames, and calculate dn.
+        dnMatrix[frame_n, inBin[mask,1]] = pos[mask] - oldPos[oldMask]/binSize # Now we use the masks to go find the positions of the same atom, that is in the same bin, in two consecutive frames, and calculate dn.
         # It is complex, but since two frames may not have the same amount of water molecules in the cylinder and it may be in disarray, direct comparison would be incomplete or straight up wrong.
 
         # Update everything for the next iteration
