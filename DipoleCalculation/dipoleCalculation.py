@@ -13,7 +13,7 @@ from datetime import datetime
 parser = argparse.ArgumentParser(description = 'Calculate the collective dipole of the given selection.')
 parser.add_argument('-i', '--in_file', type = str, required = True, help = 'Path, either absolute or relative, to the input file')
 parser.add_argument('-a', '--average', action = 'store_true', required = False, default = False, help = 'Calculate the average for the trajectory if included (with "-a" option), frame-by-frame-wise if not included. Default: False')
-parser.add_argument('-b', '--bins', action = 'store_true', required = False, default = False, help = 'Return dipole of selection "sel" binned across a cylinder. Default: False')
+parser.add_argument('-b', '--bins', action = 'store_true', required = False, default = False, help = 'Return dipole of selection "sel" binned along a cylinder. Default: False')
 
 arg = parser.parse_args()
 inFile = open(arg.in_file, 'r')
@@ -21,13 +21,15 @@ inFile = open(arg.in_file, 'r')
 dcdName = []
 outName = 'outFile.out'
 
-avg = arg.average
-
-
 # Reading inputs from the input parameters file. This is for the analysis calculation,
 # NOT for the simulation itself.
 
 print('\nReading the input and asigning variables')
+
+if arg.bins == False: # Dummy to avoid printing the warning more than once.
+    warning = True
+else:
+    warning = False
 
 for line in inFile:
     l = line.strip().split()
@@ -59,8 +61,9 @@ for line in inFile:
                 nBins = int(l[1])
             elif l[0].lower() == 'rad':
                 rad = float(l[1])
-        else:
-            print("--bins (-b) flag was either not set or was set to False. Data won't be binned.")
+        elif arg.bins == False and warning:
+            print("\nWARNING: --bins (-b) flag was not set. Data won't be binned.\n")
+            warning = False
     else:
         pass
 
