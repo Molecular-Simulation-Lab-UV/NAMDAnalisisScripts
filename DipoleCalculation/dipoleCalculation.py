@@ -139,7 +139,7 @@ elif arg.bins:
         geoCenters = numpy.average(slices, axis = 1)
         dipoles = numpy.sum((slices - geoCenters[:,numpy.newaxis,:])*numpy.reshape(charges, (int(len(charges)/sliceIndices[0]), sliceIndices[0], 1)), axis = 1)
         dipoles = dipoles/numpy.linalg.norm(dipoles, axis = 1)[:,numpy.newaxis]
-        flags = numpy.argwhere((numpy.sqrt(geoCenters[:,0]**2 + geoCenters[:,1]**2) < rad)) # Cylinder
+        flags = numpy.argwhere((numpy.sqrt(geoCenters[:,0]**2 + geoCenters[:,1]**2) < rad) & (geoCenters[:,2] < zMax) & (geoCenters[:,2] > zMin)) # Cylinder
         zPos = geoCenters[flags,-1]
         inBin = numpy.argwhere((zPos >= binArray[numpy.newaxis, :-1]) & (zPos < binArray[numpy.newaxis, 1:]))
 
@@ -147,7 +147,7 @@ elif arg.bins:
         binUniques, binCounts = numpy.unique(inBin[:,1], return_counts = True)
         diffArray = numpy.flatnonzero(numpy.isin(numpy.arange(0, len(binArray)-1, 1), binUniques, invert = True))
         binCounts = numpy.insert(binCounts, diffArray - numpy.arange(len(diffArray)), 1) # Number 1 doesn't matter, it could be any non-zero value
-        numpy.add.at(binnedDipoles, inBin[:,1], dipoles[inBin[:,0]])
+        numpy.add.at(binnedDipoles, inBin[:,1], dipoles[flags[:,0]])
         dipoleArray[f] = binnedDipoles/binCounts[:, numpy.newaxis]
         
     if arg.average:
