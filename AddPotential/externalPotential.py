@@ -17,13 +17,9 @@ finalDX = dx.grid.copy()
 
 cF = 1/(0.0862*arg.temp) # Conversion factor @ arg.temp Kelvin
 
-if arg.field > 0:
+if arg.field != 0:
     # FALTA TRANSFORMARLO A UNIDADES NAMD
     extPotential = numpy.linspace(0, arg.field*cF, dx.grid.shape[-1])
-    finalDX = finalDX + extPotential
-    
-elif arg.field < 0:
-    extPotential = numpy.arange(arg.field*cF, 0, dx.grid.shape[-1])
     finalDX = finalDX + extPotential
 
 else:
