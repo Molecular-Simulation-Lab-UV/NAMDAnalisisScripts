@@ -1,6 +1,6 @@
-pdb	../distancia/A.ref.pdb
-dcd1	../distancia/FaPIP21.Ph.rep3.first100sample.MD.dcd
-ref	chain D and not (resid 0 to 33 or resid 65 to 77 or resid 117 to 124 or resid 155 to 166 or resid 188 to 204 or resid 270 to 287) and (name N or name CA or name C or name O) and noh
-chain	A
-sel	resid 99 to 105
-out	testOut2.out
+pdb	../TestFiles/FaPIP21.CHARMMGUI.HMR.pdb
+dcd	../TestFiles/eq5.longMD.first100.dcd
+ref	segment PROA and backbone
+chain	PROA
+sel	segment PROA and resid 99 to 105
+out	test.out
