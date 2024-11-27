@@ -11,7 +11,8 @@ parser = argparse.ArgumentParser(description='Program to calculate distances bet
 parser.add_argument('-i', '--in_file', type=str, required=True, help='Path, either absolute or relative, to input file.')
 parser.add_argument('-d', '--dimension', type=int, required=False, help='Distance measured: 1 = 1D, z-distance. 2 = 2D, sqrt(x^2 + y^2) distance. 3 = 3D distance. [Default]')
 parser.add_argument('-c', '--cores', type=int, required=False, default=4, help='Core count assigned to the calculations. Default = 4')
-parser.add_argument('-t', '--transform', type=bool, required=False, default=False, help='Whether or not to apply transformations to properly center the system. Default = False')
+parser.add_argument('-t', '--transform', required=False, action='store_true',
+                     default=False, help='Whether or not to apply transformations to properly center the system. Default = False')
 
 arg = parser.parse_args()
 if arg.dimension == None:
@@ -74,7 +75,7 @@ atoms = universe.atoms
 
 if arg.transform:
     workflow = [transformations.unwrap(atoms, max_threads=arg.cores),
-                transformations.center_in_box(ref, center='geometry' max_threads=arg.cores),
+                transformations.center_in_box(ref, center='geometry', max_threads=arg.cores),
                 transformations.wrap(atoms, compound='segments', max_threads=arg.cores),
                 transformations.fit_rot_trans(ref, alignment_ref, weights=None, max_threads=arg.cores)
     ]
