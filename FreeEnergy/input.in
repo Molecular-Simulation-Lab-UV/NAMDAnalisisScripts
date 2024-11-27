@@ -1,0 +1,3 @@
+cv_namd1    dist:../TestFiles/eq2.colvars.traj
+cv_namd2    dip:../TestFiles/eq2.colvars.traj
+cv_file     ../TestFiles/colvars.config

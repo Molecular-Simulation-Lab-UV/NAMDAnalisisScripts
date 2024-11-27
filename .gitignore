@@ -1,4 +1,4 @@
-DistanceMeasurement/inputTest2.in
+DistanceMeasurement/inputTest*.in
 TestFiles/*
 dnCalculation/*.npy
 dnCalculation/timingProfile.dat
@@ -8,3 +8,4 @@ dnCalculation/__pycache__/dnModule.cpython-37.pyc
 dnCalculation/pfTiming.dat
 DipoleCalculation/input2.in
 DipoleCalculation/input3.in
+FreeEnergy/test*
