@@ -17,7 +17,7 @@ colvars = {}
 colvar_config = {}
 dcdName = []
 mainSel = None
-R = 8.314
+R = 8.314e-3 # kJ/(mol * K) https://sciencenotes.org/boltzmann-constant-definition-and-units/
 T = 298.15
 
 inFile = open(arg.in_file, 'r')
@@ -113,8 +113,9 @@ counts, _ = np.histogramdd(
 )
 # np.savetxt('./test_counts.txt', counts, fmt='%.2e')
 # TODO: Generate figure only if 1D or 2D
-counts[counts==0] = 1
-fes = -R * T * np.log(counts/stacked_colvars.shape[0])
+counts[counts==0] = counts.max()
+# We multiply R to transform units kJ -> kcal
+fes = -R/4.184 * T * np.log(counts/stacked_colvars.shape[0])
 X, Y = np.meshgrid(*fes_grid)
 X = X[:-1, :-1] + (X[1:, 1:] - X[:-1, :-1])/2
 Y = Y[:-1, :-1] + (Y[1:, 1:] - Y[:-1, :-1])/2
