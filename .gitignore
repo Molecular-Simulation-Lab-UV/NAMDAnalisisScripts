@@ -1,4 +1,5 @@
 DistanceMeasurement/inputTest*.in
+DistanceMeasurement/test*
 TestFiles/*
 dnCalculation/*.npy
 dnCalculation/timingProfile.dat
@@ -9,3 +10,4 @@ dnCalculation/pfTiming.dat
 DipoleCalculation/input2.in
 DipoleCalculation/input3.in
 FreeEnergy/test*
+DistanceMeasurement/inputTest2.in
