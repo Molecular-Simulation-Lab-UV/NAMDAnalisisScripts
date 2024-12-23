@@ -4,11 +4,11 @@ import prody
 import numpy as np
 import argparse
 from datetime import datetime
+from Miscellaneous.Wrap import dynamic_wrap
 
 parser = argparse.ArgumentParser(description='Program to calculate distances between a first selection and all others')
 parser.add_argument('-i', '--in_file', type=str, required=True, help='Path, either absolute or relative, to input file.')
 parser.add_argument('-d', '--dimension', type=int, required=False, help='Distance measured: 1 = 1D, z-distance. 2 = 2D, sqrt(x^2 + y^2) distance. 3 = 3D distance. [Default]')
-parser.add_argument('-c', '--cores', type=int, required=False, default=4, help='Core count assigned to the calculations. Default = 4')
 parser.add_argument('-t', '--transform', type=bool, required=False, default=False, help='Whether or not to apply transformations to properly center the system. Default = False')
 
 arg = parser.parse_args()
@@ -19,6 +19,7 @@ else:
 
 #  Should usually go lower, but we put it here to be able to select multiple dcds and selections
 selName = {}
+wrapSel = []
 dcdName = []
 mainSel = None
 
@@ -57,6 +58,10 @@ for line in inFile:
             mainSel = l[1]
         else:
             selName[l[0]] = l[1]
+    elif 'wrapref' in l[0].lower():
+        wrapRefName = ' '.join(l[1:])
+    elif 'wrapsel' in l[0].lower():
+        wrapSel.append(' '.join(l[1:]))
     elif l[0].lower() == 'out':
         outName = l[1]
 
@@ -107,16 +112,22 @@ print(distArray.shape)
 
 if dim == 1:
     for i, frame in enumerate(traj):
+        if arg.transform:
+            dynamic_wrap(pdb, frame, wrapRefName, wrapSel)
         frame.superpose()
         for j, sel in enumerate(selections):
             distArray[i,j] = calc1D(refSel, sel)
 elif dim == 2:
     for i, frame in enumerate(traj):
+        if arg.transform:
+            dynamic_wrap(pdb, frame, wrapRefName, wrapSel)
         frame.superpose()
         for j, sel in enumerate(selections):
             distArray[i,j] = calc2D(refSel, sel)
 elif dim == 3:
     for i, frame in enumerate(traj):
+        if arg.transform:
+            dynamic_wrap(pdb, frame, wrapRefName, wrapSel)
         frame.superpose()
         for j, sel in enumerate(selections):
             distArray[i,j] = prody.calcDistance(prody.calcCenter(refSel), prody.calcCenter(sel))
