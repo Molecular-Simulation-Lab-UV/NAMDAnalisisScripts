@@ -11,3 +11,7 @@ DipoleCalculation/input2.in
 DipoleCalculation/input3.in
 FreeEnergy/test*
 DistanceMeasurement/inputTest2.in
+DistanceMeasurement/input_wrapping_test.in
+DistanceMeasurement/inputTest2.in
+DistanceMeasurement/test2.out
+DistanceMeasurement/inputTest2.in
