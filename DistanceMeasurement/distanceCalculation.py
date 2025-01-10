@@ -5,11 +5,11 @@ import numpy as np
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Miscellaneous')))
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Miscellaneous')))
 
 import argparse
 from datetime import datetime
-from Wrap import dynamic_wrap
+from Miscellaneous.Wrap import dynamic_wrap
 
 parser = argparse.ArgumentParser(description='Program to calculate distances between a first selection and all others')
 parser.add_argument('-i', '--in_file', type=str, required=True, help='Path, either absolute or relative, to input file.')

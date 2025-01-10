@@ -1,3 +1,4 @@
+from typing import List
 import prody
 import numpy as np
 from os import remove, path
@@ -5,7 +6,7 @@ from os import remove, path
 def dynamic_wrap(pdb: prody.AtomGroup,
                  frame: prody.Frame,
                  reference_element: str,
-                 wrapping_elements: list[str]) -> None:
+                 wrapping_elements: List[str]) -> None:
     
     ref = prody.calcCenter(pdb.select(reference_element))
     elements = [pdb.select(e) for e in wrapping_elements]
