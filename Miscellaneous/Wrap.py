@@ -59,4 +59,5 @@ def file_wrap(pdbName: str,
             prody.wrapAtoms(pdb, unitcell=cell[:3], center=prody.calcCenter(pdb.select(wrap_selection)))
 
         dcd2.write(pdb, unitcell=cell)
+    dcd.close()
     dcd2.close()
