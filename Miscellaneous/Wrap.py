@@ -25,7 +25,7 @@ def dynamic_wrap(pdb: prody.AtomGroup,
 def file_wrap(pdbName: str,
               dcdName: str,
               refName: str,
-              selections: list[str],
+              selections: List[str],
               wrap: bool=True,
               wrap_selection: str='protein',
               outFile: str='output.dcd') -> None:
