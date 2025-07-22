@@ -1,0 +1,4 @@
+pdb     /path/to/pdb
+dcd     /path/to/dcd
+sel     selection in prody
+out     output.out
