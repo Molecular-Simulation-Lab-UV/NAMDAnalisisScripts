@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: research_scripts
+Version: 0.1
+License-File: LICENSE.md
+Requires-Dist: prody
+Requires-Dist: numpy
+Requires-Dist: griddataformats
+Requires-Dist: mdanalysis

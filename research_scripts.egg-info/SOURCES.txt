@@ -1,0 +1,15 @@
+LICENSE.md
+README.md
+setup.py
+DistanceMeasurement/ILE-dist.py
+DistanceMeasurement/__init__.py
+DistanceMeasurement/distanceCalculation.py
+DistanceMeasurement/distanceCalculation_mdanalysis.py
+Miscellaneous/Concatenate.py
+Miscellaneous/Wrap.py
+Miscellaneous/__init__.py
+research_scripts.egg-info/PKG-INFO
+research_scripts.egg-info/SOURCES.txt
+research_scripts.egg-info/dependency_links.txt
+research_scripts.egg-info/requires.txt
+research_scripts.egg-info/top_level.txt

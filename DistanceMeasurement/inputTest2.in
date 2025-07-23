@@ -1,6 +1,6 @@
-pdb	../TestFiles/FaPIP21.CHARMMGUI.HMR.pdb
+pdb     ../TestFiles/FaPIP21.CHARMMGUI.HMR.pdb
 dcd1	../TestFiles/eq5.longMD.first100.dcd
-ref	segname PROA and backbone
-sel1	segname PROA and resid 106 and name CD
-sel2	segname PROA and name CA and resid 95 110 185
-out	test2.out
+ref     segment PROA and backbone
+sel1	segment PROA and resid 106 and name CD
+sel2	segment PROA and name CA and resid 95 110 185
+out     test2.out
