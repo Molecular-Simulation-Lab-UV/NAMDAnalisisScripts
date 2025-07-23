@@ -1,0 +1,4 @@
+prody
+numpy
+griddataformats
+mdanalysis

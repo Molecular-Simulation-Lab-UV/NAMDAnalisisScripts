@@ -1,0 +1,9 @@
+pdb         ../TestFiles/FaPIP21.plus3.HMR.pdb
+dcd1	    ../TestFiles/eq5.80_to_120ns.stride50.plus3.dcd
+ref         segment PROA and backbone
+sel1        segment PROA and resid 72 and name CG
+sel2        segment PROC and resid 244 and name NZ
+wrap1       segment PROB
+wrap2       segment PROC
+wrap3       segment PROD
+out         test_wrap.out

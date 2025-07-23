@@ -1,0 +1,7 @@
+pdb     ../TestFiles/FaPIP21.CHARMMGUI.HMR.pdb
+dcd     ../TestFiles/eq5.longMD.first100.dcd
+ref     segment PROA and backbone
+thr     4
+sel1    segment PROA and resid 46 and noh
+sel2    segment PROC and resid 265 and name CZ
+out     test.out
