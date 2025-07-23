@@ -42,15 +42,7 @@ t1 = datetime.now()
 traj = mdtraj.load_dcd(dcdName, top=pdbName, atom_indices=idx)
 dssp = mdtraj.compute_dssp(traj)
 
-<<<<<<< HEAD
 with open(outName, mode='w', newline='\n') as f1:
-=======
-<<<<<<< HEAD
-with open(outName, mode='w', newline='\n') as f1:
-=======
-with open(outName, mode='w') as f1:
->>>>>>> 8bba0c2b60d1c2a342a5fc342987c182d2335c92
->>>>>>> 1a39c89b5312249daa3570e64a0c059b9725e242
     for line in dssp:
         f1.write(','.join(line.astype(str)))
 
