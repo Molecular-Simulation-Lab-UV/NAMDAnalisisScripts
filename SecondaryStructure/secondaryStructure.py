@@ -3,8 +3,9 @@ from prody import parsePDB
 import argparse
 from datetime import datetime
 
-parser = argparse.ArgumentParser(description = 'Calculate the collective dipole of the given selection.')
-parser.add_argument('-i', '--in_file', type = str, required = True, help = 'Path, either absolute or relative, to the input file')
+parser = argparse.ArgumentParser(description='Calculate the secondary structure of the given selection.')
+parser.add_argument('-i', '--in_file', type=str, required=True, help='Path, either absolute or relative, to the input file')
+parser.add_argument('-s', '--simplified', action='store_true', required=False, default=True, help='Simplified flag for mdtraj.compute_dssp')
 
 arg = parser.parse_args()
 
@@ -40,7 +41,7 @@ idx = sel.getIndices()
 t1 = datetime.now()
 
 traj = mdtraj.load_dcd(dcdName, top=pdbName, atom_indices=idx)
-dssp = mdtraj.compute_dssp(traj)
+dssp = mdtraj.compute_dssp(traj, simplified=arg.simplified)
 
 with open(outName, mode='w') as f1:
     for line in dssp:
