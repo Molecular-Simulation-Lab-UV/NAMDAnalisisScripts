@@ -62,6 +62,8 @@ for line in inFile:
     elif l[0] == 'out': # Path to the output file, name included.
         outName = l[1]
 
+inFile.close()
+
 # Setting up structure and linking the trajectory files to it.
 
 pdb = prody.parsePDB(pdbName)

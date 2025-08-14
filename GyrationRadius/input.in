@@ -1,0 +1,5 @@
+dcd     ../TestFiles/eq5.longMD.first100.dcd
+pdb     ../TestFiles/FaPIP21.CHARMMGUI.HMR.pdb
+ref     segment PROA and backbone
+sel     segment PROA and resid 100 to 110
+out     test.out
