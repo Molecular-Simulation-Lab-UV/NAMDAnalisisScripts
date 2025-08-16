@@ -1,4 +1,5 @@
-import prody
+import MDAnalysis as mda
+from MDAnalysis.analysis.rdf import InterRDF
 import numpy as np
 import argparse
 from datetime import datetime
@@ -10,6 +11,8 @@ arg = parser.parse_args()
 inFile = open(arg.in_file, 'r')
 
 dcdName = []
+mainSel = None
+selName = None
 outName = 'outFile.out'
 
 # Reading inputs from the input parameters file. This is for the analysis calculation,
@@ -29,43 +32,41 @@ for line in inFile:
         else:
             refName = l[1]
     elif 'sel' in l[0].lower(): # Should be a broader selection, not including the position bounds (without "and z <= XX") E.g., "name OH2" or "index 9000".
-        if len(l[1:]) > 1:
-            selName = ' '.join(l[1:])
+        if mainSel == None:
+            if len(l[1:]) > 1:
+                mainSel = ' '.join(l[1:])
+            else:
+                mainSel = l[1]
+        elif mainSel != None and selName == None:
+            if len(l[1:]) > 1:
+                selName = ' '.join(l[1:])
+            else:
+                selName = l[1]
         else:
-            selName = l[1]
+            print('Only two selections are needed to calculate RDF.')
+            print('Selection {0} will be ignored.'.format(' '.join(l[1:])))
+            continue
     elif l[0].lower() == 'out': # Path to the output file, name included.
         outName = l[1]
 
 inFile.close()
 
-pdb = prody.parsePDB(pdbName)
-traj = prody.Trajectory(dcdName[0])
-if len(dcdName) > 1:
-    for d in dcdName[1:]:
-        traj.addFile(d)
+universe = mda.Universe(pdbName, dcdName)
+sel1 = universe.select_atoms(mainSel)
+sel2 = universe.select_atoms(selName)
 
-t1 = datetime.now()
+rdf_run = InterRDF(sel1, sel2)
+rdf_run.run()
 
-traj.link(pdb)
-traj.setCoords(pdb)
-traj.setAtoms(pdb.select(refName)) # refName = Selection used when aligning frames (frame.superpose())
-sel = pdb.select(selName)
-
-gyration = np.zeros(len(traj))
-
-for f, frame in enumerate(traj):
-    frame.superpose()
-    gyration[f] = prody.calcGyradius(sel)
+res = rdf_run.results
+bins = res.bins
+rdf = res.rdf
+counts = res.count.astype(int)
 
 outFile = open(outName, 'w+')
-outFile.write('# Frame \t |\t Gyration Radius \n')
+outFile.write('# Bin \t |\t RDF \t |\t Count \n')
 
-for f, vals in enumerate(gyration):
-    outFile.write('{0} \t\t {1} \n'.format(f, vals))
+for f in range(len(rdf)):
+    outFile.write('{0:5.2f} \t {1:10.7f} \t {2:7d} \n'.format(bins[f], rdf[f], counts[f]))
     
 outFile.close()
-
-t2 = datetime.now()
-
-print('\nFIN')
-print('Time to completion was {0}'.format((t2.replace(microsecond=0) - t1.replace(microsecond=0))))
