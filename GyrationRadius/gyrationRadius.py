@@ -51,16 +51,17 @@ traj.setCoords(pdb)
 traj.setAtoms(pdb.select(refName)) # refName = Selection used when aligning frames (frame.superpose())
 sel = pdb.select(selName)
 
-gyration = np.vstack((np.arange(len(traj)), np.zeros(len(traj)))).T
+gyration = np.zeros(len(traj))
 
 for f, frame in enumerate(traj):
-    gyration[f,1] = prody.calcGyradius(sel)
+    frame.superpose()
+    gyration[f] = prody.calcGyradius(sel)
 
 outFile = open(outName, 'w+')
 outFile.write('# Frame \t |\t Gyration Radius \n')
 
 for f, vals in enumerate(gyration):
-    outFile.write('{0} \t\t {1} \n'.format(int(vals[0]), vals[1]))
+    outFile.write('{0} \t\t {1} \n'.format(f, vals))
     
 outFile.close()
 
