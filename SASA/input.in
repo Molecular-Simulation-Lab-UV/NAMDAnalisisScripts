@@ -1,0 +1,4 @@
+pdb     ../TestFiles/FaPIP21.CHARMMGUI.HMR.pdb
+dcd     ../TestFiles/eq5.longMD.first100.dcd
+sel     segment PROA and resid 40 to 42
+out     output.out
