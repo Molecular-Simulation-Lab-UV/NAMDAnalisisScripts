@@ -5,7 +5,7 @@ from datetime import datetime
 
 parser = argparse.ArgumentParser(description='Calculate the secondary structure of the given selection.')
 parser.add_argument('-i', '--in_file', type=str, required=True, help='Path, either absolute or relative, to the input file')
-parser.add_argument('-s', '--simplified', action='store_true', required=False, default=True, help='Simplified flag for mdtraj.compute_dssp')
+parser.add_argument('-s', '--simplified', action='store_false', required=False, default=True, help='Simplified flag for mdtraj.compute_dssp')
 
 arg = parser.parse_args()
 
