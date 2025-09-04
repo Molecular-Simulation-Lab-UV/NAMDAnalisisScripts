@@ -61,8 +61,9 @@ for f, frame in enumerate(traj):
 outFile = open(outName, 'w+')
 outFile.write('# Frame \t |\t {0} \n'.format(selName))
 
+theta = theta.astype('str')
 for f, vals in enumerate(theta):
-    outFile.write('{0} \t\t {1} \n'.format(f, vals))
+    outFile.write('{0:7} \t {1} \n'.format(f, '\t'.join(vals)))
     
 outFile.close()
 
