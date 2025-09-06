@@ -1,4 +1,5 @@
 import prody
+from Miscellaneous.reader import Reader
 from datetime import datetime
 import argparse
 import numpy as np
@@ -10,63 +11,38 @@ parser.add_argument('-i', '--in_file', type=str, required=True, help='Path, eith
                                                                      'file')
 
 arg = parser.parse_args()
+r = Reader(arg.in_file)
 
-dcdName = []
-outName = 'outFile.dat'
-
-inFile = open(arg.in_file, 'r')
-
-print('Reading input file. Stand by')
-
-for line in inFile:
-    l = line.strip().split()
-    try:
-        if 'dcd' in l[0]:
-            dcdName.append(l[1])
-        elif 'sel' in l[0]:
-            selName = ' '.join(l[1:])
-        elif 'ref' in l[0]:
-            refSel = ' '.join(l[1:])
-        elif 'pdb' in l[0]:
-            pdbName = l[1]
-        elif 'out' in l[0]:
-            outName = l[1]
-    except:
-        pass
-
-inFile.close()
-
-pdb = prody.parsePDB(pdbName)
-traj = prody.Trajectory(dcdName[0])
-if len(dcdName) > 1:
-    for dcd in dcdName[1:]:
+pdb = prody.parsePDB(r.variables['pdb'])
+traj = prody.Trajectory('dcd')
+for dcd in r.variables['dcd']:
         traj.addFile(dcd)
 traj.link(pdb)
 traj.setCoords(pdb)
-traj.setAtoms(pdb.select(refSel))
+traj.setAtoms(pdb.select(r.variables['ref']))
 
 print('Starting calculations and setting stuff up. You\'re free to go make some coffee or something')
 
 t1 = datetime.now()
 
 # TODO: Sel should be conditional. COM or individual atoms (e.g. resid 1), a choice must be made
-sel = pdb.select(selName)
+sel = pdb.select(r.variables['sel'])
 theta = np.zeros((len(traj), len(sel)))
 
 for f, frame in enumerate(traj):
     frame.superpose()
     pos = sel.getCoords()
-    theta[f] = 180*np.arccos(np.divide(1, np.linalg.norm(pos, axis=1)))/pi
+    norm_pos = np.linalg.norm(pos, axis=1)
+    projection_x = np.divide(np.dot(pos, [1, 0, 0]), norm_pos)
+    projection_y = np.divide(np.dot(pos, [0, 1, 0]), norm_pos)
+    theta[f] = 180*np.arctan2(pos[:,1], pos[:,0])/pi
 
-outFile = open(outName, 'w+')
-outFile.write('# Frame \t |\t {0} \n'.format(selName))
-
-theta = theta.astype('str')
-for f, vals in enumerate(theta):
-    outFile.write('{0:7} \t {1} \n'.format(f, '\t'.join(vals)))
+with open(r.variables['out'], 'w+') as out_file:
+    out_file.write('# Frame \t | \t {0} \n'.format(r.variables['sel']))
+    theta = theta.astype('str')
+    for f, vals in enumerate(theta):
+        out_file.write('{0:7} \t {1} \n'.format(f, '\t'.join(vals)))
     
-outFile.close()
-
 t2 = datetime.now()
 
 print('\nFIN')

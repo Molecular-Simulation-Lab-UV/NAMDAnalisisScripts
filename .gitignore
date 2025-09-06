@@ -16,3 +16,4 @@ DistanceMeasurement/inputTest2.in
 DistanceMeasurement/test2.out
 DistanceMeasurement/inputTest2.in
 research_scripts.egg-info/*
+Miscellaneous/__pycache__/*.pyc
