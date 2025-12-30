@@ -11,6 +11,14 @@ mol addfile 24DynCm.dcd waitfor all
 
 package require pbctools
 
+###################################################################################
+#                                                                                 #
+#               PARA GENERAR UN ARCHIVO AJUSTADO DE XST USAR COMANDO:             #
+#                                                                                 #
+# awk 'NR <= 2 || (NR > 2 && (NR - 3) % 5 == 0)' 24DynCm.xst > 24DynCm_sync.xst   #
+#                                                                                 #
+###################################################################################
+
 puts "Leyendo XST..."
 pbc readxst 24DynCm_sync.xst
 
